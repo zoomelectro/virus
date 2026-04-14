@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Créditos & Pagos – StreamPanel Admin</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">💳 Créditos & Pagos</div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openModal('modalCredit')">+ Asignar créditos</button>
+        <button class="btn btn-ghost" onclick="openModal('modalPayment')">💰 Registrar pago</button>
+      </div>
+    </header>
+    <main class="page-content">
+
+      <div class="stat-grid" id="statGrid"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:1.25rem;">
+
+        <!-- Top users by credits -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">🏆 Ranking de Créditos</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Usuario</th><th>Créditos</th><th>Plan</th></tr></thead>
+              <tbody id="topUsersTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Transactions log -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📈 Historial de Transacciones</span>
+            <select id="filterType" onchange="renderTx()" style="width:auto;">
+              <option value="">Todos</option>
+              <option value="credit">Créditos</option>
+              <option value="payment">Pagos</option>
+              <option value="debit">Débitos</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Usuario</th><th>Tipo</th><th>Monto</th><th>Nota</th><th>Fecha</th></tr></thead>
+              <tbody id="txTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Assign Credits -->
+<div class="modal-backdrop" id="modalCredit" style="display:none;">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title">💳 Asignar Créditos</span>
+      <button class="btn btn-xs btn-ghost" onclick="closeModal('modalCredit')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Usuario</label>
+        <select id="c_user"></select>
+      </div>
+      <div class="form-group">
+        <label>Cantidad de créditos</label>
+        <input type="number" id="c_amount" placeholder="30" min="1">
+      </div>
+      <div class="form-group">
+        <label>Tipo de operación</label>
+        <select id="c_type">
+          <option value="credit">Añadir créditos (+)</option>
+          <option value="debit">Descontar créditos (−)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nota</label>
+        <input type="text" id="c_note" placeholder="Pago recibido, ajuste, bonificación...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalCredit')">Cancelar</button>
+      <button class="btn btn-primary" onclick="assignCredits()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Register Payment -->
+<div class="modal-backdrop" id="modalPayment" style="display:none;">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title">💰 Registrar Pago</span>
+      <button class="btn btn-xs btn-ghost" onclick="closeModal('modalPayment')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Usuario</label>
+        <select id="p_user"></select>
+      </div>
+      <div class="form-group">
+        <label>Monto ($)</label>
+        <input type="number" id="p_amount" placeholder="25.00" step="0.01" min="0">
+      </div>
+      <div class="form-group">
+        <label>Método de pago</label>
+        <select id="p_method">
+          <option value="efectivo">Efectivo</option>
+          <option value="transferencia">Transferencia bancaria</option>
+          <option value="paypal">PayPal</option>
+          <option value="crypto">Criptomonedas</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Plan a asignar</label>
+        <select id="p_plan"></select>
+      </div>
+      <div class="form-group">
+        <label>Referencia / Comprobante</label>
+        <input type="text" id="p_ref" placeholder="Número de comprobante, hash, etc.">
+      </div>
+      <div class="form-group">
+        <label>Créditos a otorgar</label>
+        <input type="number" id="p_credits" placeholder="30" min="0">
+      </div>
+      <div class="form-group">
+        <label>Días adicionales de servicio</label>
+        <input type="number" id="p_days" placeholder="30" min="0">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalPayment')">Cancelar</button>
+      <button class="btn btn-success" onclick="registerPayment()">✅ Registrar Pago</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../assets/js/db.js"></script>
+<script src="components.js"></script>
+<script>
+  requireAdmin();
+  renderSidebar('credits');
+  populateSelects();
+
+  function populateSelects() {
+    const users = DB.getUsers().filter(u => u.role !== 'admin');
+    const options = users.map(u => `<option value="${u.id}">${u.username} (créditos: ${u.credits})</option>`).join('');
+    document.getElementById('c_user').innerHTML = options;
+    document.getElementById('p_user').innerHTML = options;
+
+    const plans = DB.getPlans();
+    document.getElementById('p_plan').innerHTML = plans.map(p =>
+      `<option value="${p.slug}" data-credits="${p.credits}" data-days="${p.duration}">${p.name} – $${p.price}</option>`
+    ).join('');
+
+    // Auto-fill credits/days when plan changes
+    document.getElementById('p_plan').addEventListener('change', function() {
+      const opt = this.options[this.selectedIndex];
+      document.getElementById('p_credits').value = opt.dataset.credits || '';
+      document.getElementById('p_days').value = opt.dataset.days || '';
+    });
+
+    // Trigger once
+    document.getElementById('p_plan').dispatchEvent(new Event('change'));
+  }
+
+  function renderStats() {
+    const txs = DB.getTransactions();
+    const totalCredits = txs.filter(t => t.type === 'credit').reduce((a, t) => a + t.amount, 0);
+    const totalPayments = txs.filter(t => t.type === 'payment').length;
+    const totalRevenue = txs.filter(t => t.type === 'payment').reduce((a, t) => a + (t.usd || 0), 0);
+    const users = DB.getUsers().filter(u => u.role !== 'admin');
+    const totalUserCredits = users.reduce((a, u) => a + (u.credits || 0), 0);
+
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-card green">
+        <div class="stat-label">Créditos asignados</div>
+        <div class="stat-value">${totalCredits.toLocaleString()}</div>
+        <div class="stat-sub">en total histórico</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Pagos registrados</div>
+        <div class="stat-value">${totalPayments}</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Ingresos ($)</div>
+        <div class="stat-value">$${totalRevenue.toFixed(2)}</div>
+        <div class="stat-sub">USD acumulado</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">Créditos activos</div>
+        <div class="stat-value">${totalUserCredits.toLocaleString()}</div>
+        <div class="stat-sub">en cuentas de usuarios</div>
+      </div>
+    `;
+  }
+
+  function renderTopUsers() {
+    const users = DB.getUsers()
+      .filter(u => u.role !== 'admin')
+      .sort((a, b) => (b.credits || 0) - (a.credits || 0))
+      .slice(0, 8);
+
+    const tbody = document.getElementById('topUsersTable');
+    if (!users.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text3);">—</td></tr>'; return; }
+
+    tbody.innerHTML = users.map((u, i) => `
+      <tr>
+        <td style="color:var(--text3);">${i + 1}</td>
+        <td><strong>${u.username}</strong></td>
+        <td class="text-green font-bold">${u.credits}</td>
+        <td><span class="badge badge-purple">${u.plan}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderTx() {
+    const filter = document.getElementById('filterType').value;
+    let txs = DB.getTransactions();
+    if (filter) txs = txs.filter(t => t.type === filter);
+
+    const tbody = document.getElementById('txTable');
+    if (!txs.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--text3);">Sin transacciones</td></tr>'; return; }
+
+    tbody.innerHTML = txs.map(tx => {
+      const u = DB.getUserById(tx.userId);
+      const badgeMap = { credit: 'badge-green', payment: 'badge-blue', debit: 'badge-red' };
+      const labelMap = { credit: '+ Crédito', payment: '💰 Pago', debit: '− Débito' };
+      return `
+        <tr>
+          <td>${u ? u.username : '—'}</td>
+          <td><span class="badge ${badgeMap[tx.type] || 'badge-gray'}">${labelMap[tx.type] || tx.type}</span></td>
+          <td class="${tx.type === 'debit' ? 'text-red' : 'text-green'} font-bold">${tx.type === 'debit' ? '−' : '+'}${tx.amount}</td>
+          <td class="text-muted">${tx.note || '—'}</td>
+          <td class="text-muted">${fmtDate(tx.createdAt)}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function assignCredits() {
+    const userId = document.getElementById('c_user').value;
+    const amount = parseInt(document.getElementById('c_amount').value);
+    const type = document.getElementById('c_type').value;
+    const note = document.getElementById('c_note').value;
+
+    if (!userId || !amount || amount < 1) { toast('Completa los campos requeridos.', 'error'); return; }
+
+    if (type === 'credit') {
+      DB.addCredits(userId, amount, note);
+    } else {
+      // debit
+      const users = DB.getUsers();
+      const idx = users.findIndex(u => u.id === userId);
+      if (idx !== -1) {
+        users[idx].credits = Math.max(0, (users[idx].credits || 0) - amount);
+        DB.saveUsers(users);
+        DB.addTransaction({ userId, type: 'debit', amount: -amount, note });
+      }
+    }
+
+    toast(`Operación realizada: ${type === 'credit' ? '+' : '−'}${amount} créditos.`, 'success');
+    closeModal('modalCredit');
+    populateSelects();
+    renderStats();
+    renderTopUsers();
+    renderTx();
+  }
+
+  function registerPayment() {
+    const userId = document.getElementById('p_user').value;
+    const amount = parseFloat(document.getElementById('p_amount').value);
+    const method = document.getElementById('p_method').value;
+    const plan = document.getElementById('p_plan').value;
+    const ref = document.getElementById('p_ref').value;
+    const credits = parseInt(document.getElementById('p_credits').value) || 0;
+    const days = parseInt(document.getElementById('p_days').value) || 0;
+
+    if (!userId || !amount) { toast('Completa los campos requeridos.', 'error'); return; }
+
+    // Update user
+    const user = DB.getUserById(userId);
+    const updates = { plan, credits: (user.credits || 0) + credits };
+    if (days) {
+      const base = user.expiresAt ? Math.max(new Date(user.expiresAt), Date.now()) : Date.now();
+      updates.expiresAt = new Date(base + days * 86400000).toISOString();
+    }
+    DB.updateUser(userId, updates);
+
+    // Log transaction
+    DB.addTransaction({ userId, type: 'payment', amount: credits, usd: amount, note: `${method}${ref ? ' – ' + ref : ''}` });
+
+    toast(`Pago de $${amount} registrado. ${credits} créditos asignados.`, 'success');
+    closeModal('modalPayment');
+    populateSelects();
+    renderStats();
+    renderTopUsers();
+    renderTx();
+  }
+
+  renderStats();
+  renderTopUsers();
+  renderTx();
+</script>
+</body>
+</html>

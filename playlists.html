@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playlists M3U – StreamPanel Admin</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">📋 Playlists M3U</div>
+    </header>
+    <main class="page-content">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔗 Generar enlace M3U por usuario</span></div>
+          <p class="text-muted mb-2" style="font-size:13px;">Selecciona un usuario para generar su playlist personalizada.</p>
+          <div class="form-group">
+            <label>Usuario</label>
+            <select id="m3uUser"></select>
+          </div>
+          <div class="flex gap-sm">
+            <button class="btn btn-primary" onclick="previewM3U()">👁 Vista previa</button>
+            <button class="btn btn-ghost" onclick="downloadM3U()">⬇ Descargar M3U</button>
+            <button class="btn btn-ghost" onclick="copyM3ULink()">📋 Copiar enlace</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">📊 Estadísticas de Playlists</span></div>
+          <div id="m3uStats"></div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">👁 Vista previa del contenido M3U</span></div>
+        <pre id="m3uPreview" style="background:var(--bg3);border-radius:8px;padding:1rem;font-size:12px;color:var(--text2);overflow-x:auto;max-height:400px;white-space:pre-wrap;font-family:monospace;">Selecciona un usuario y presiona "Vista previa"</pre>
+      </div>
+
+    </main>
+  </div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script src="../assets/js/db.js"></script>
+<script src="components.js"></script>
+<script>
+  requireAdmin();
+  renderSidebar('playlists');
+
+  function populateUsers() {
+    const users = DB.getUsers().filter(u => u.role !== 'admin');
+    document.getElementById('m3uUser').innerHTML = users.map(u =>
+      `<option value="${u.id}">${u.username} (${u.status})</option>`
+    ).join('');
+  }
+
+  function renderStats() {
+    const chs = DB.getChannels();
+    const users = DB.getUsers().filter(u => u.role !== 'admin' && u.status === 'active');
+    document.getElementById('m3uStats').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:var(--bg3);border-radius:8px;padding:1rem;text-align:center;">
+          <div style="font-family:var(--font-head);font-size:1.5rem;font-weight:700;">${chs.filter(c=>c.status==='active').length}</div>
+          <div style="font-size:12px;color:var(--text3);">canales activos</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:1rem;text-align:center;">
+          <div style="font-family:var(--font-head);font-size:1.5rem;font-weight:700;">${users.length}</div>
+          <div style="font-size:12px;color:var(--text3);">usuarios activos</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:1rem;text-align:center;">
+          <div style="font-family:var(--font-head);font-size:1.5rem;font-weight:700;">${[...new Set(chs.map(c=>c.category))].length}</div>
+          <div style="font-size:12px;color:var(--text3);">categorías</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:1rem;text-align:center;">
+          <div style="font-family:var(--font-head);font-size:1.5rem;font-weight:700;">${users.length}</div>
+          <div style="font-size:12px;color:var(--text3);">playlists generables</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function previewM3U() {
+    const uid = document.getElementById('m3uUser').value;
+    const m3u = DB.generateM3U(uid);
+    document.getElementById('m3uPreview').textContent = m3u || 'Usuario inactivo o sin acceso.';
+  }
+
+  function downloadM3U() {
+    const uid = document.getElementById('m3uUser').value;
+    const u = DB.getUserById(uid);
+    const m3u = DB.generateM3U(uid);
+    if (!m3u) { toast('No se puede generar la playlist para este usuario.', 'error'); return; }
+    const blob = new Blob([m3u], { type: 'application/x-mpegurl' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${u.username}_playlist.m3u`;
+    a.click();
+    toast('M3U descargado.', 'success');
+  }
+
+  function copyM3ULink() {
+    const uid = document.getElementById('m3uUser').value;
+    const base = window.location.origin + window.location.pathname.replace('/admin/playlists.html','');
+    const url = `${base}/player/index.html?uid=${uid}`;
+    navigator.clipboard.writeText(url).then(() => toast('Enlace del reproductor copiado.', 'success'));
+  }
+
+  populateUsers();
+  renderStats();
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPTV Panel – Iniciar Sesión</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .login-err {
+      background: rgba(255,95,107,0.1);
+      border: 1px solid rgba(255,95,107,0.3);
+      border-radius: 8px;
+      padding: 0.65rem 1rem;
+      color: var(--red);
+      font-size: 13px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .creds-hint {
+      background: rgba(108,99,255,0.08);
+      border: 1px solid rgba(108,99,255,0.2);
+      border-radius: 8px;
+      padding: 0.65rem 1rem;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 1.25rem;
+    }
+    .creds-hint strong { color: var(--accent2); }
+    .btn-login {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
+      border: none;
+      border-radius: var(--radius);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font-head);
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: opacity 0.15s;
+    }
+    .btn-login:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <h1>⚡ StreamPanel</h1>
+        <p>Sistema IPTV de gestión avanzada</p>
+      </div>
+
+      <div class="creds-hint">
+        Demo Admin: <strong>admin</strong> / <strong>admin123</strong><br>
+        Demo User: <strong>demo</strong> / <strong>demo123</strong>
+      </div>
+
+      <div class="login-err" id="loginErr">Usuario o contraseña incorrectos.</div>
+
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="username" placeholder="Ingresa tu usuario" autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <button class="btn-login" onclick="doLogin()">Iniciar Sesión</button>
+    </div>
+  </div>
+
+  <script src="assets/js/db.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (DB.currentUser()) {
+      const u = DB.currentUser();
+      window.location.href = u.role === 'admin' ? 'admin/dashboard.html' : 'player/index.html';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    function doLogin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const err = document.getElementById('loginErr');
+      err.style.display = 'none';
+
+      if (!username || !password) {
+        err.textContent = 'Completa todos los campos.';
+        err.style.display = 'block';
+        return;
+      }
+
+      const user = DB.login(username, password);
+      if (!user) {
+        err.textContent = 'Usuario o contraseña incorrectos.';
+        err.style.display = 'block';
+        return;
+      }
+
+      if (user.role === 'admin') {
+        window.location.href = 'admin/dashboard.html';
+      } else {
+        window.location.href = 'player/index.html';
+      }
+    }
+  </script>
+</body>
+</html>

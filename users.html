@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usuarios – StreamPanel Admin</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">👥 Usuarios</div>
+      <div class="topbar-actions">
+        <div class="search-bar"><input type="text" id="searchInput" placeholder="Buscar usuario..." oninput="renderTable()"></div>
+        <button class="btn btn-primary" onclick="openModal('modalCreate')">+ Nuevo usuario</button>
+      </div>
+    </header>
+    <main class="page-content">
+
+      <!-- Stats row -->
+      <div class="stat-grid" id="statGrid" style="margin-bottom:1.25rem;"></div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Créditos</th>
+                <th>Conexiones</th>
+                <th>Vence</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal Create/Edit -->
+<div class="modal-backdrop" id="modalCreate" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Crear Usuario</span>
+      <button class="btn btn-xs btn-ghost" onclick="closeModal('modalCreate')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editUserId">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Usuario *</label>
+          <input type="text" id="f_username" placeholder="nombre_usuario">
+        </div>
+        <div class="form-group">
+          <label>Contraseña *</label>
+          <input type="password" id="f_password" placeholder="••••••••">
+          <div class="form-hint">Dejar vacío para no cambiar (edición)</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="f_email" placeholder="correo@ejemplo.com">
+        </div>
+        <div class="form-group">
+          <label>Rol</label>
+          <select id="f_role">
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Plan</label>
+          <select id="f_plan"></select>
+        </div>
+        <div class="form-group">
+          <label>Créditos iniciales</label>
+          <input type="number" id="f_credits" placeholder="30" min="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Conexiones simultáneas</label>
+          <input type="number" id="f_connections" placeholder="1" min="1" max="99">
+        </div>
+        <div class="form-group">
+          <label>Fecha de vencimiento</label>
+          <input type="date" id="f_expires">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Estado</label>
+          <select id="f_status">
+            <option value="active">Activo</option>
+            <option value="inactive">Inactivo</option>
+            <option value="banned">Baneado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notas</label>
+          <input type="text" id="f_notes" placeholder="Notas internas...">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalCreate')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveUser()">Guardar Usuario</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Credits -->
+<div class="modal-backdrop" id="modalCredits" style="display:none;">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-header">
+      <span class="modal-title">💳 Agregar Créditos</span>
+      <button class="btn btn-xs btn-ghost" onclick="closeModal('modalCredits')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="creditUserId">
+      <p class="text-muted mb-2" style="font-size:13px;">Usuario: <strong id="creditUserName" class="text-accent"></strong></p>
+      <div class="form-group">
+        <label>Cantidad de créditos</label>
+        <input type="number" id="creditAmount" placeholder="30" min="1">
+      </div>
+      <div class="form-group">
+        <label>Nota / Referencia</label>
+        <input type="text" id="creditNote" placeholder="Pago efectivo, transferencia...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalCredits')">Cancelar</button>
+      <button class="btn btn-success" onclick="doAddCredits()">✅ Agregar Créditos</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../assets/js/db.js"></script>
+<script src="components.js"></script>
+<script>
+  requireAdmin();
+  renderSidebar('users');
+  populatePlans();
+
+  function populatePlans() {
+    const sel = document.getElementById('f_plan');
+    DB.getPlans().forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.slug;
+      o.textContent = p.name;
+      sel.appendChild(o);
+    });
+  }
+
+  function renderStats() {
+    const users = DB.getUsers().filter(u => u.role !== 'admin');
+    const active = users.filter(u => u.status === 'active').length;
+    const expiring = users.filter(u => {
+      const d = daysLeft(u.expiresAt);
+      return d !== null && d <= 7 && d >= 0;
+    }).length;
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-card purple">
+        <div class="stat-label">Total usuarios</div>
+        <div class="stat-value">${users.length}</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Activos</div>
+        <div class="stat-value">${active}</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Vencen en 7 días</div>
+        <div class="stat-value">${expiring}</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Inactivos/Baneados</div>
+        <div class="stat-value">${users.length - active}</div>
+      </div>
+    `;
+  }
+
+  function renderTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let users = DB.getUsers().filter(u => u.role !== 'admin');
+    if (q) users = users.filter(u => u.username.toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q));
+
+    const tbody = document.getElementById('usersTable');
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3);">Sin usuarios encontrados</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = users.map(u => {
+      const dl = daysLeft(u.expiresAt);
+      const expiryClass = dl !== null && dl <= 7 ? 'text-red' : 'text-muted';
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:500;">${u.username}</div>
+            <div style="font-size:11px;color:var(--text3);">${u.notes || ''}</div>
+          </td>
+          <td class="text-muted">${u.email || '—'}</td>
+          <td><span class="badge badge-purple">${u.plan}</span></td>
+          <td class="text-green font-bold">${u.credits}</td>
+          <td class="text-muted">${u.maxConnections || 1}</td>
+          <td class="${expiryClass}">${fmtDate(u.expiresAt)}${dl !== null ? ` <span style="font-size:11px;">(${dl}d)</span>` : ''}</td>
+          <td>${statusBadge(u.status)}</td>
+          <td>
+            <div class="flex gap-sm">
+              <button class="btn btn-xs btn-ghost" onclick="editUser('${u.id}')" title="Editar">✏️</button>
+              <button class="btn btn-xs btn-success" onclick="openCredits('${u.id}')" title="Créditos">💳</button>
+              <button class="btn btn-xs btn-ghost" onclick="copyM3U('${u.id}')" title="Copiar enlace M3U">📋</button>
+              <button class="btn btn-xs btn-danger" onclick="deleteUser('${u.id}')" title="Eliminar">🗑</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function saveUser() {
+    const id = document.getElementById('editUserId').value;
+    const username = document.getElementById('f_username').value.trim();
+    const password = document.getElementById('f_password').value;
+    const email = document.getElementById('f_email').value.trim();
+    const role = document.getElementById('f_role').value;
+    const plan = document.getElementById('f_plan').value;
+    const credits = document.getElementById('f_credits').value;
+    const connections = document.getElementById('f_connections').value;
+    const expires = document.getElementById('f_expires').value;
+    const status = document.getElementById('f_status').value;
+    const notes = document.getElementById('f_notes').value.trim();
+
+    if (!username) { toast('El nombre de usuario es requerido.', 'error'); return; }
+
+    if (id) {
+      // Edit mode
+      const data = { username, email, role, plan, credits: parseInt(credits)||0, maxConnections: parseInt(connections)||1, status, notes };
+      if (expires) data.expiresAt = new Date(expires).toISOString();
+      if (password) data.password = password;
+      DB.updateUser(id, data);
+      toast('Usuario actualizado correctamente.', 'success');
+    } else {
+      // Create mode
+      if (!password) { toast('La contraseña es requerida.', 'error'); return; }
+      if (DB.getUserByUsername(username)) { toast('Ese nombre de usuario ya existe.', 'error'); return; }
+      DB.createUser({
+        username, password, email, role, plan,
+        credits: parseInt(credits) || 0,
+        maxConnections: parseInt(connections) || 1,
+        expiresAt: expires ? new Date(expires).toISOString() : null,
+        status, notes
+      });
+      toast('Usuario creado exitosamente.', 'success');
+    }
+
+    closeModal('modalCreate');
+    renderTable();
+    renderStats();
+  }
+
+  function editUser(id) {
+    const u = DB.getUserById(id);
+    if (!u) return;
+    document.getElementById('editUserId').value = u.id;
+    document.getElementById('f_username').value = u.username;
+    document.getElementById('f_password').value = '';
+    document.getElementById('f_email').value = u.email || '';
+    document.getElementById('f_role').value = u.role;
+    document.getElementById('f_plan').value = u.plan;
+    document.getElementById('f_credits').value = u.credits;
+    document.getElementById('f_connections').value = u.maxConnections || 1;
+    document.getElementById('f_expires').value = u.expiresAt ? u.expiresAt.slice(0,10) : '';
+    document.getElementById('f_status').value = u.status;
+    document.getElementById('f_notes').value = u.notes || '';
+    document.getElementById('modalTitle').textContent = '✏️ Editar Usuario';
+    openModal('modalCreate');
+  }
+
+  function deleteUser(id) {
+    confirmDialog('¿Eliminar este usuario? Esta acción no se puede deshacer.', () => {
+      DB.deleteUser(id);
+      toast('Usuario eliminado.', 'info');
+      renderTable();
+      renderStats();
+    });
+  }
+
+  function openCredits(id) {
+    const u = DB.getUserById(id);
+    if (!u) return;
+    document.getElementById('creditUserId').value = id;
+    document.getElementById('creditUserName').textContent = u.username;
+    document.getElementById('creditAmount').value = '';
+    document.getElementById('creditNote').value = '';
+    openModal('modalCredits');
+  }
+
+  function doAddCredits() {
+    const id = document.getElementById('creditUserId').value;
+    const amount = parseInt(document.getElementById('creditAmount').value);
+    const note = document.getElementById('creditNote').value;
+    if (!amount || amount < 1) { toast('Ingresa una cantidad válida.', 'error'); return; }
+    DB.addCredits(id, amount, note);
+    toast(`${amount} créditos añadidos correctamente.`, 'success');
+    closeModal('modalCredits');
+    renderTable();
+  }
+
+  function copyM3U(userId) {
+    const base = window.location.origin + window.location.pathname.replace('/admin/users.html','');
+    const url = `${base}/player/index.html?uid=${userId}`;
+    navigator.clipboard.writeText(url).then(() => toast('Enlace copiado al portapapeles.', 'success'));
+  }
+
+  // Reset form when opening for new user
+  document.getElementById('modalCreate').addEventListener('click', function(e) {
+    if (e.target === this) closeModal('modalCreate');
+  });
+
+  document.querySelector('[onclick="openModal(\'modalCreate\')"]').addEventListener('click', () => {
+    document.getElementById('editUserId').value = '';
+    document.getElementById('f_username').value = '';
+    document.getElementById('f_password').value = '';
+    document.getElementById('f_email').value = '';
+    document.getElementById('f_role').value = 'user';
+    document.getElementById('f_plan').value = DB.getPlans()[0]?.slug || '';
+    document.getElementById('f_credits').value = '30';
+    document.getElementById('f_connections').value = '1';
+    document.getElementById('f_expires').value = '';
+    document.getElementById('f_status').value = 'active';
+    document.getElementById('f_notes').value = '';
+    document.getElementById('modalTitle').textContent = 'Crear Usuario';
+  });
+
+  renderStats();
+  renderTable();
+</script>
+</body>
+</html>

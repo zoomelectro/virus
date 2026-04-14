@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajustes – StreamPanel Admin</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">⚙️ Ajustes del Sistema</div>
+    </header>
+    <main class="page-content">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+
+        <!-- Profile -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">👤 Mi Perfil</span></div>
+          <div class="form-group">
+            <label>Nombre de usuario</label>
+            <input type="text" id="prof_username" readonly style="opacity:0.6;">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="prof_email" placeholder="admin@example.com">
+          </div>
+          <div class="form-group">
+            <label>Nueva contraseña</label>
+            <input type="password" id="prof_password" placeholder="Dejar vacío para no cambiar">
+          </div>
+          <button class="btn btn-primary" onclick="saveProfile()">Guardar perfil</button>
+        </div>
+
+        <!-- System Info -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">ℹ️ Información del sistema</span></div>
+          <div id="sysInfo"></div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card" style="border-color:rgba(255,95,107,0.3);">
+          <div class="card-header"><span class="card-title" style="color:var(--red);">⚠️ Zona de peligro</span></div>
+          <p class="text-muted mb-2" style="font-size:13px;">Estas acciones son irreversibles. Úsalas con precaución.</p>
+          <div class="flex gap-sm">
+            <button class="btn btn-danger" onclick="clearTransactions()">Limpiar transacciones</button>
+            <button class="btn btn-danger" onclick="factoryReset()">Restablecer todo</button>
+          </div>
+        </div>
+
+        <!-- About -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">⚡ Acerca de StreamPanel</span></div>
+          <div style="font-size:13px;color:var(--text2);line-height:2;">
+            <div><strong style="color:var(--text);">Versión:</strong> 1.0.0</div>
+            <div><strong style="color:var(--text);">Motor:</strong> HTML5 + localStorage</div>
+            <div><strong style="color:var(--text);">GitHub:</strong> <a href="https://github.com" style="color:var(--accent2);">Ver repositorio</a></div>
+            <div><strong style="color:var(--text);">Licencia:</strong> MIT</div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script src="../assets/js/db.js"></script>
+<script src="components.js"></script>
+<script>
+  requireAdmin();
+  renderSidebar('settings');
+
+  function loadProfile() {
+    const u = DB.currentUser();
+    document.getElementById('prof_username').value = u.username;
+    document.getElementById('prof_email').value = u.email || '';
+  }
+
+  function saveProfile() {
+    const u = DB.currentUser();
+    const email = document.getElementById('prof_email').value.trim();
+    const password = document.getElementById('prof_password').value;
+    const updates = { email };
+    if (password) updates.password = password;
+    DB.updateUser(u.id, updates);
+    toast('Perfil actualizado correctamente.', 'success');
+    document.getElementById('prof_password').value = '';
+  }
+
+  function renderSysInfo() {
+    const users = DB.getUsers();
+    const channels = DB.getChannels();
+    const plans = DB.getPlans();
+    const txs = DB.getTransactions();
+    const storage = JSON.stringify(localStorage).length;
+
+    document.getElementById('sysInfo').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${[
+          ['Usuarios totales', users.length],
+          ['Canales totales', channels.length],
+          ['Planes activos', plans.length],
+          ['Transacciones', txs.length],
+          ['Almacenamiento', (storage/1024).toFixed(1) + ' KB'],
+          ['Sesión activa', '✅'],
+        ].map(([label, val]) => `
+          <div style="background:var(--bg3);border-radius:8px;padding:0.75rem;">
+            <div style="font-size:11px;color:var(--text3);">${label}</div>
+            <div style="font-weight:600;">${val}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function clearTransactions() {
+    confirmDialog('¿Eliminar todas las transacciones? Esta acción no se puede deshacer.', () => {
+      localStorage.setItem('iptv_transactions', JSON.stringify([]));
+      toast('Transacciones eliminadas.', 'info');
+      renderSysInfo();
+    });
+  }
+
+  function factoryReset() {
+    confirmDialog('⚠️ ADVERTENCIA: Esto borrará TODOS los datos (usuarios, canales, planes, transacciones). ¿Continuar?', () => {
+      ['iptv_users','iptv_channels','iptv_plans','iptv_transactions','iptv_playlists'].forEach(k => localStorage.removeItem(k));
+      DB.init();
+      toast('Sistema restablecido. Recarga la página.', 'info');
+      setTimeout(() => window.location.href = '../index.html', 1500);
+    });
+  }
+
+  loadProfile();
+  renderSysInfo();
+</script>
+</body>
+</html>

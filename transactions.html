@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transacciones – StreamPanel Admin</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">📈 Transacciones</div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" onclick="exportCSV()">📤 Exportar CSV</button>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="stat-grid" id="statGrid"></div>
+      <div class="card">
+        <div class="card-header">
+          <div class="flex gap-md">
+            <select id="filterType" onchange="renderTable()" style="width:auto;">
+              <option value="">Todos los tipos</option>
+              <option value="credit">Créditos</option>
+              <option value="payment">Pagos</option>
+              <option value="debit">Débitos</option>
+            </select>
+            <div class="search-bar"><input type="text" id="searchInput" placeholder="Buscar usuario..." oninput="renderTable()"></div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Usuario</th><th>Tipo</th><th>Créditos</th><th>Monto $</th><th>Nota</th><th>Fecha</th></tr>
+            </thead>
+            <tbody id="txTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script src="../assets/js/db.js"></script>
+<script src="components.js"></script>
+<script>
+  requireAdmin();
+  renderSidebar('transactions');
+
+  function renderStats() {
+    const txs = DB.getTransactions();
+    const payments = txs.filter(t => t.type === 'payment');
+    const credits = txs.filter(t => t.type === 'credit');
+    const usdTotal = payments.reduce((a, t) => a + (t.usd || 0), 0);
+    const creditsTotal = credits.reduce((a, t) => a + (t.amount || 0), 0);
+
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-card purple"><div class="stat-label">Total transacciones</div><div class="stat-value">${txs.length}</div></div>
+      <div class="stat-card green"><div class="stat-label">Pagos registrados</div><div class="stat-value">${payments.length}</div></div>
+      <div class="stat-card amber"><div class="stat-label">Ingresos USD</div><div class="stat-value">$${usdTotal.toFixed(2)}</div></div>
+      <div class="stat-card blue"><div class="stat-label">Créditos otorgados</div><div class="stat-value">${creditsTotal}</div></div>
+    `;
+  }
+
+  function renderTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const type = document.getElementById('filterType').value;
+    let txs = DB.getTransactions();
+    if (type) txs = txs.filter(t => t.type === type);
+    if (q) txs = txs.filter(t => {
+      const u = DB.getUserById(t.userId);
+      return u && u.username.toLowerCase().includes(q);
+    });
+
+    const tbody = document.getElementById('txTable');
+    if (!txs.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3);">Sin transacciones</td></tr>'; return; }
+
+    const badge = { credit:'badge-green', payment:'badge-blue', debit:'badge-red' };
+    const label = { credit:'Crédito', payment:'Pago', debit:'Débito' };
+
+    tbody.innerHTML = txs.map(tx => {
+      const u = DB.getUserById(tx.userId);
+      return `
+        <tr>
+          <td style="font-size:11px;color:var(--text3);">${tx.id}</td>
+          <td>${u ? u.username : '—'}</td>
+          <td><span class="badge ${badge[tx.type]||'badge-gray'}">${label[tx.type]||tx.type}</span></td>
+          <td class="${tx.type==='debit'?'text-red':'text-green'} font-bold">${tx.amount > 0 ? '+':'' }${tx.amount}</td>
+          <td class="text-amber">${tx.usd ? '$' + tx.usd.toFixed(2) : '—'}</td>
+          <td class="text-muted">${tx.note || '—'}</td>
+          <td class="text-muted">${fmtDate(tx.createdAt)}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function exportCSV() {
+    const txs = DB.getTransactions();
+    const rows = [['ID','Usuario','Tipo','Créditos','USD','Nota','Fecha']];
+    txs.forEach(tx => {
+      const u = DB.getUserById(tx.userId);
+      rows.push([tx.id, u ? u.username : '', tx.type, tx.amount, tx.usd || '', tx.note || '', tx.createdAt]);
+    });
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'transacciones.csv';
+    a.click();
+    toast('CSV exportado correctamente.', 'success');
+  }
+
+  renderStats();
+  renderTable();
+</script>
+</body>
+</html>

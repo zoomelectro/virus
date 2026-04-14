@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – StreamPanel Admin</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- Main -->
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">📊 Dashboard</div>
+      <div class="topbar-actions">
+        <span id="topbar-date" class="text-muted" style="font-size:12px;"></span>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- Stats -->
+      <div class="stat-grid" id="statGrid"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
+
+        <!-- Recent Users -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Usuarios recientes</span>
+            <a href="users.html" class="btn btn-ghost btn-sm">Ver todos</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Usuario</th><th>Plan</th><th>Créditos</th><th>Estado</th></tr></thead>
+              <tbody id="recentUsersTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Últimas transacciones</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Usuario</th><th>Tipo</th><th>Monto</th><th>Fecha</th></tr></thead>
+              <tbody id="recentTxTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plans Summary -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Resumen de Planes</span>
+          <a href="plans.html" class="btn btn-ghost btn-sm">Gestionar</a>
+        </div>
+        <div id="plansGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../assets/js/db.js"></script>
+<script src="components.js"></script>
+<script>
+  requireAdmin();
+  renderSidebar('dashboard');
+
+  // Topbar date
+  document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('es-ES', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // Stats
+  function renderStats() {
+    const users = DB.getUsers().filter(u => u.role !== 'admin');
+    const active = users.filter(u => u.status === 'active').length;
+    const channels = DB.getChannels().filter(c => c.status === 'active').length;
+    const txs = DB.getTransactions();
+    const revenue = txs.filter(t => t.type === 'payment').reduce((a, t) => a + (t.amount || 0), 0);
+
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-card purple">
+        <div class="stat-label">Total Usuarios</div>
+        <div class="stat-value">${users.length}</div>
+        <div class="stat-sub">${active} activos</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Canales Activos</div>
+        <div class="stat-value">${channels}</div>
+        <div class="stat-sub">en transmisión</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Transacciones</div>
+        <div class="stat-value">${txs.length}</div>
+        <div class="stat-sub">historial total</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Ingresos</div>
+        <div class="stat-value">$${revenue.toLocaleString()}</div>
+        <div class="stat-sub">créditos cobrados</div>
+      </div>
+    `;
+  }
+
+  function renderRecentUsers() {
+    const users = DB.getUsers().filter(u => u.role !== 'admin').slice(0, 6);
+    const tbody = document.getElementById('recentUsersTable');
+    if (!users.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-muted" style="padding:1rem;text-align:center;">Sin usuarios</td></tr>'; return; }
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td><strong>${u.username}</strong></td>
+        <td><span class="badge badge-purple">${u.plan}</span></td>
+        <td class="text-green font-bold">${u.credits}</td>
+        <td>${statusBadge(u.status)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderRecentTx() {
+    const txs = DB.getTransactions().slice(0, 6);
+    const tbody = document.getElementById('recentTxTable');
+    if (!txs.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-muted" style="padding:1rem;text-align:center;">Sin transacciones</td></tr>'; return; }
+    tbody.innerHTML = txs.map(tx => {
+      const u = DB.getUserById(tx.userId);
+      return `
+        <tr>
+          <td>${u ? u.username : '—'}</td>
+          <td><span class="badge ${tx.type==='credit'?'badge-green':'badge-blue'}">${tx.type}</span></td>
+          <td class="${tx.type==='credit'?'text-green':'text-accent'} font-bold">${tx.amount > 0 ? '+' : ''}${tx.amount}</td>
+          <td class="text-muted">${new Date(tx.createdAt).toLocaleDateString('es-ES')}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function renderPlans() {
+    const plans = DB.getPlans();
+    const users = DB.getUsers();
+    document.getElementById('plansGrid').innerHTML = plans.map(p => {
+      const count = users.filter(u => u.plan === p.slug).length;
+      return `
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1rem;">
+          <div style="font-family:var(--font-head);font-weight:700;font-size:1rem;margin-bottom:4px;">${p.name}</div>
+          <div style="font-size:1.5rem;font-weight:700;color:var(--accent2);margin-bottom:4px;">$${p.price}</div>
+          <div style="font-size:12px;color:var(--text3);">${count} usuarios · ${p.duration} días</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderStats();
+  renderRecentUsers();
+  renderRecentTx();
+  renderPlans();
+</script>
+</body>
+</html>

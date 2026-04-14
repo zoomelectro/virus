@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planes – StreamPanel Admin</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">💎 Planes de Servicio</div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openNewPlan()">+ Crear plan</button>
+      </div>
+    </header>
+    <main class="page-content">
+
+      <div id="plansGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem;margin-bottom:2rem;"></div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Distribución de usuarios por plan</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Plan</th><th>Precio</th><th>Créditos</th><th>Días</th><th>Pantallas</th><th>Usuarios</th><th>Acciones</th></tr></thead>
+            <tbody id="plansTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal Plan -->
+<div class="modal-backdrop" id="modalPlan" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="planModalTitle">Crear Plan</span>
+      <button class="btn btn-xs btn-ghost" onclick="closeModal('modalPlan')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pl_id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre del plan *</label>
+          <input type="text" id="pl_name" placeholder="Básico, Premium...">
+        </div>
+        <div class="form-group">
+          <label>Slug (identificador) *</label>
+          <input type="text" id="pl_slug" placeholder="basico, premium...">
+          <div class="form-hint">Sin espacios ni caracteres especiales</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Precio ($)</label>
+          <input type="number" id="pl_price" placeholder="25" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Créditos incluidos</label>
+          <input type="number" id="pl_credits" placeholder="90" min="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Duración (días)</label>
+          <input type="number" id="pl_duration" placeholder="30" min="1">
+        </div>
+        <div class="form-group">
+          <label>Conexiones simultáneas</label>
+          <input type="number" id="pl_connections" placeholder="4" min="1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Descripción</label>
+        <input type="text" id="pl_description" placeholder="4 pantallas, 30 días, HD+4K...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalPlan')">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePlan()">Guardar Plan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../assets/js/db.js"></script>
+<script src="components.js"></script>
+<script>
+  requireAdmin();
+  renderSidebar('plans');
+
+  const PLAN_COLORS = ['badge-purple', 'badge-blue', 'badge-green', 'badge-amber'];
+
+  function renderPlansCards() {
+    const plans = DB.getPlans();
+    const users = DB.getUsers();
+    document.getElementById('plansGrid').innerHTML = plans.map((p, i) => {
+      const count = users.filter(u => u.plan === p.slug).length;
+      const color = ['#6c63ff','#38b6ff','#22d3a0','#f5a623'][i % 4];
+      return `
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:${color};opacity:0.07;"></div>
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Plan</div>
+          <div style="font-family:var(--font-head);font-size:1.4rem;font-weight:800;margin-bottom:4px;">${p.name}</div>
+          <div style="font-size:2.2rem;font-weight:800;color:${color};line-height:1;">$${p.price}</div>
+          <div style="color:var(--text3);font-size:12px;margin:8px 0 12px;">por ${p.duration} días</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:12px;">
+            <div style="background:var(--bg3);padding:8px;border-radius:8px;text-align:center;">
+              <div style="font-weight:600;font-size:1rem;">${p.credits}</div>
+              <div style="color:var(--text3);">créditos</div>
+            </div>
+            <div style="background:var(--bg3);padding:8px;border-radius:8px;text-align:center;">
+              <div style="font-weight:600;font-size:1rem;">${p.connections}</div>
+              <div style="color:var(--text3);">pantallas</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">${p.description || ''}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:12px;color:var(--text2);"><strong style="color:var(--text);">${count}</strong> usuarios</span>
+            <div class="flex gap-sm">
+              <button class="btn btn-xs btn-ghost" onclick="editPlan('${p.id}')">✏️</button>
+              <button class="btn btn-xs btn-danger" onclick="deletePlan('${p.id}')">🗑</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderPlansTable() {
+    const plans = DB.getPlans();
+    const users = DB.getUsers();
+    const tbody = document.getElementById('plansTable');
+    tbody.innerHTML = plans.map((p, i) => {
+      const count = users.filter(u => u.plan === p.slug).length;
+      return `
+        <tr>
+          <td><span class="badge ${PLAN_COLORS[i%4]}">${p.name}</span></td>
+          <td class="text-green font-bold">$${p.price}</td>
+          <td>${p.credits}</td>
+          <td>${p.duration} días</td>
+          <td>${p.connections}</td>
+          <td>${count}</td>
+          <td>
+            <div class="flex gap-sm">
+              <button class="btn btn-xs btn-ghost" onclick="editPlan('${p.id}')">✏️ Editar</button>
+              <button class="btn btn-xs btn-danger" onclick="deletePlan('${p.id}')">🗑</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function openNewPlan() {
+    document.getElementById('pl_id').value = '';
+    document.getElementById('pl_name').value = '';
+    document.getElementById('pl_slug').value = '';
+    document.getElementById('pl_price').value = '';
+    document.getElementById('pl_credits').value = '';
+    document.getElementById('pl_duration').value = '30';
+    document.getElementById('pl_connections').value = '1';
+    document.getElementById('pl_description').value = '';
+    document.getElementById('planModalTitle').textContent = 'Crear Plan';
+    openModal('modalPlan');
+  }
+
+  function editPlan(id) {
+    const p = DB.getPlans().find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('pl_id').value = p.id;
+    document.getElementById('pl_name').value = p.name;
+    document.getElementById('pl_slug').value = p.slug;
+    document.getElementById('pl_price').value = p.price;
+    document.getElementById('pl_credits').value = p.credits;
+    document.getElementById('pl_duration').value = p.duration;
+    document.getElementById('pl_connections').value = p.connections;
+    document.getElementById('pl_description').value = p.description || '';
+    document.getElementById('planModalTitle').textContent = '✏️ Editar Plan';
+    openModal('modalPlan');
+  }
+
+  function savePlan() {
+    const id = document.getElementById('pl_id').value;
+    const data = {
+      name: document.getElementById('pl_name').value.trim(),
+      slug: document.getElementById('pl_slug').value.trim().toLowerCase().replace(/\s+/g,'-'),
+      price: parseFloat(document.getElementById('pl_price').value) || 0,
+      credits: parseInt(document.getElementById('pl_credits').value) || 0,
+      duration: parseInt(document.getElementById('pl_duration').value) || 30,
+      connections: parseInt(document.getElementById('pl_connections').value) || 1,
+      description: document.getElementById('pl_description').value.trim(),
+    };
+
+    if (!data.name || !data.slug) { toast('Nombre y slug son requeridos.', 'error'); return; }
+
+    if (id) { DB.updatePlan(id, data); toast('Plan actualizado.', 'success'); }
+    else { DB.createPlan(data); toast('Plan creado.', 'success'); }
+
+    closeModal('modalPlan');
+    renderPlansCards();
+    renderPlansTable();
+  }
+
+  function deletePlan(id) {
+    confirmDialog('¿Eliminar este plan? Los usuarios asignados no se verán afectados.', () => {
+      DB.deletePlan(id);
+      toast('Plan eliminado.', 'info');
+      renderPlansCards();
+      renderPlansTable();
+    });
+  }
+
+  // Auto-slug
+  document.getElementById('pl_name')?.addEventListener('input', function() {
+    if (!document.getElementById('pl_id').value) {
+      document.getElementById('pl_slug').value = this.value.toLowerCase()
+        .replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    }
+  });
+
+  renderPlansCards();
+  renderPlansTable();
+</script>
+</body>
+</html>
