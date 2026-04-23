@@ -1,0 +1,802 @@
+
+<h2 class="sr-only">Sistema de Control de Pagos CORPOSANA con login por roles, envío de comprobante por WhatsApp</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.app{min-height:600px;background:var(--color-background-tertiary);font-family:var(--font-sans);}
+.login-screen{min-height:600px;display:flex;align-items:center;justify-content:center;background:var(--color-background-tertiary);}
+.login-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:2rem;width:360px;}
+.login-logo{text-align:center;margin-bottom:1.5rem;}
+.login-logo-icon{width:52px;height:52px;border-radius:12px;background:#0C447C;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;margin:0 auto 10px;}
+.login-title{font-size:18px;font-weight:500;color:var(--color-text-primary);}
+.login-sub{font-size:12px;color:var(--color-text-secondary);margin-top:2px;}
+.role-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;}
+.role-btn{padding:10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);cursor:pointer;text-align:center;transition:all 0.15s;}
+.role-btn:hover{background:var(--color-background-secondary);}
+.role-btn.selected{border:2px solid #185FA5;background:#E6F1FB;}
+.role-btn .role-icon{font-size:20px;display:block;margin-bottom:4px;}
+.role-btn .role-name{font-size:12px;font-weight:500;color:var(--color-text-primary);}
+.role-btn .role-desc{font-size:10px;color:var(--color-text-secondary);}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.form-label{font-size:12px;color:var(--color-text-secondary);font-weight:500;}
+.form-input{height:36px;padding:0 10px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);width:100%;}
+.form-input:focus{outline:none;border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.12);}
+.btn{height:36px;padding:0 16px;font-size:13px;border-radius:var(--border-radius-md);cursor:pointer;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);transition:all 0.15s;}
+.btn:hover{background:var(--color-background-secondary);}
+.btn:active{transform:scale(0.98);}
+.btn-primary{background:#185FA5;color:white;border-color:#185FA5;}
+.btn-primary:hover{background:#0C447C;border-color:#0C447C;}
+.btn-success{background:#3B6D11;color:white;border-color:#3B6D11;}
+.btn-success:hover{background:#27500A;}
+.btn-danger{background:transparent;color:#A32D2D;border-color:#A32D2D;}
+.btn-danger:hover{background:#FCEBEB;}
+.btn-sm{height:28px;padding:0 10px;font-size:12px;}
+.btn-wa{background:#25D366;color:white;border-color:#25D366;display:flex;align-items:center;gap:6px;}
+.btn-wa:hover{background:#1DA851;}
+.btn-full{width:100%;}
+.login-error{background:#FCEBEB;color:#A32D2D;border:0.5px solid #F7C1C1;border-radius:var(--border-radius-md);padding:8px 12px;font-size:12px;margin-bottom:12px;display:none;}
+.header{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:#0C447C;display:flex;align-items:center;justify-content:center;font-size:16px;color:white;}
+.logo-text{font-size:15px;font-weight:500;}
+.logo-sub{font-size:11px;color:var(--color-text-secondary);}
+.user-badge{display:flex;align-items:center;gap:8px;}
+.user-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;}
+.avatar-admin{background:#E6F1FB;color:#0C447C;}
+.avatar-cobrador{background:#EAF3DE;color:#27500A;}
+.user-info{font-size:12px;}
+.user-role{font-size:10px;color:var(--color-text-secondary);}
+.nav{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:0 1.5rem;display:flex;gap:0;overflow-x:auto;}
+.nav-btn{padding:0 16px;height:44px;border:none;background:transparent;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.15s;}
+.nav-btn:hover{color:var(--color-text-primary);}
+.nav-btn.active{color:#185FA5;border-bottom-color:#185FA5;font-weight:500;}
+.nav-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.content{padding:1.5rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem;}
+.stat-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;}
+.stat-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px;}
+.stat-value{font-size:22px;font-weight:500;}
+.stat-sub{font-size:11px;color:var(--color-text-secondary);margin-top:4px;}
+.stat-green{color:#3B6D11;}
+.stat-red{color:#A32D2D;}
+.stat-blue{color:#185FA5;}
+.section{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:1rem;}
+.section-header{padding:1rem 1.25rem;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;}
+.section-title{font-size:14px;font-weight:500;}
+.section-body{padding:1.25rem;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-select{height:36px;padding:0 10px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);width:100%;cursor:pointer;}
+.form-full{grid-column:1 / -1;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;padding:8px 12px;font-size:11px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap;}
+td{padding:10px 12px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--color-background-secondary);}
+.status-badge{font-size:11px;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+.status-al-dia{background:#EAF3DE;color:#3B6D11;}
+.status-pendiente{background:#FAEEDA;color:#854F0B;}
+.status-vencido{background:#FCEBEB;color:#A32D2D;}
+.status-pagado{background:#E6F1FB;color:#185FA5;}
+.badge-admin{background:#E6F1FB;color:#0C447C;font-size:10px;padding:2px 8px;border-radius:20px;}
+.badge-cobrador{background:#EAF3DE;color:#27500A;font-size:10px;padding:2px 8px;border-radius:20px;}
+.amount-prefix{position:absolute;left:10px;font-size:13px;color:var(--color-text-secondary);pointer-events:none;top:50%;transform:translateY(-50%);}
+.amount-wrap{position:relative;display:flex;align-items:center;}
+.amount-input{padding-left:32px !important;}
+.info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px;}
+.info-row:last-child{border-bottom:none;}
+.info-key{color:var(--color-text-secondary);}
+.info-val{font-weight:500;}
+.recibo-box{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:1rem;background:var(--color-background-secondary);font-size:12px;}
+.recibo-header{text-align:center;margin-bottom:8px;font-size:13px;font-weight:500;}
+.recibo-line{display:flex;justify-content:space-between;padding:3px 0;}
+.recibo-total{font-weight:500;font-size:13px;border-top:0.5px solid var(--color-border-secondary);margin-top:6px;padding-top:6px;}
+.alert{padding:10px 14px;border-radius:var(--border-radius-md);font-size:13px;margin-bottom:12px;display:none;}
+.alert.show{display:block;}
+.alert-success{background:#EAF3DE;color:#3B6D11;border:0.5px solid #C0DD97;}
+.alert-error{background:#FCEBEB;color:#A32D2D;border:0.5px solid #F7C1C1;}
+.alert-warning{background:#FAEEDA;color:#854F0B;border:0.5px solid #FAC775;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.search-wrap{position:relative;flex:1;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--color-text-secondary);}
+.search-input{width:100%;height:36px;padding:0 10px 0 32px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);}
+.modal-bg{background:rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;min-height:500px;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:1.5rem;width:440px;max-width:95%;}
+.corte-badge{font-size:10px;padding:2px 6px;border-radius:20px;background:#FCEBEB;color:#A32D2D;}
+.wa-btn-wrap{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.wa-preview{background:#EAF3DE;border-radius:var(--border-radius-md);padding:10px 12px;font-size:12px;color:#27500A;border:0.5px solid #C0DD97;white-space:pre-wrap;line-height:1.6;}
+.cobrador-banner{background:#E6F1FB;border:0.5px solid #B5D4F4;border-radius:var(--border-radius-md);padding:10px 14px;font-size:12px;color:#0C447C;margin-bottom:1rem;display:flex;align-items:center;gap:8px;}
+.locked-overlay{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:2rem;text-align:center;color:var(--color-text-secondary);font-size:13px;}
+.chart-bar-wrap{display:flex;flex-direction:column;gap:8px;}
+.chart-row{display:flex;align-items:center;gap:10px;font-size:12px;}
+.chart-label{width:70px;color:var(--color-text-secondary);text-align:right;font-size:11px;}
+.chart-bar-bg{flex:1;height:20px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden;}
+.chart-bar-fill{height:100%;border-radius:4px;}
+.chart-val{font-size:11px;color:var(--color-text-secondary);width:90px;text-align:right;}
+</style>
+
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">💧</div>
+      <div class="login-title">CORPOSANA</div>
+      <div class="login-sub">Sistema de Control de Pagos</div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <div class="form-label" style="margin-bottom:6px;">Seleccione su perfil de acceso</div>
+      <div class="role-selector">
+        <div class="role-btn selected" id="role-admin" onclick="selectRole('admin')">
+          <span class="role-icon">🔑</span>
+          <div class="role-name">Administrador</div>
+          <div class="role-desc">Acceso total</div>
+        </div>
+        <div class="role-btn" id="role-cobrador" onclick="selectRole('cobrador')">
+          <span class="role-icon">💼</span>
+          <div class="role-name">Cobradora</div>
+          <div class="role-desc">Solo cobros</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contraseña</label>
+      <input class="form-input" id="login-pass" type="password" placeholder="Ingrese su contraseña..." onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-error" id="login-error">Contraseña incorrecta. Intente nuevamente.</div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Ingresar al sistema</button>
+    <div style="margin-top:12px;padding:10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:11px;color:var(--color-text-secondary);">
+      Admin: <b>admin123</b> &nbsp;|&nbsp; Cobradora: <b>cobro2025</b>
+    </div>
+  </div>
+</div>
+
+<div id="main-app" style="display:none;">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">💧</div>
+      <div>
+        <div class="logo-text">CORPOSANA</div>
+        <div class="logo-sub" id="hdr-sub">Sistema de Pagos</div>
+      </div>
+    </div>
+    <div class="user-badge">
+      <span style="font-size:11px;color:var(--color-text-secondary);" id="hdr-fecha"></span>
+      <div class="user-avatar" id="hdr-avatar"></div>
+      <div>
+        <div class="user-info" id="hdr-user"></div>
+        <div class="user-role" id="hdr-role"></div>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="logout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="nav" id="main-nav">
+    <button class="nav-btn active" id="nav-dashboard" onclick="switchTab('dashboard')">Panel</button>
+    <button class="nav-btn" id="nav-clientes" onclick="switchTab('clientes')">Clientes</button>
+    <button class="nav-btn" id="nav-pagos" onclick="switchTab('pagos')">Registrar pago</button>
+    <button class="nav-btn" id="nav-historial" onclick="switchTab('historial')">Historial</button>
+    <button class="nav-btn" id="nav-vencidos" onclick="switchTab('vencidos')">Vencidos</button>
+    <button class="nav-btn" id="nav-reportes" onclick="switchTab('reportes')">Reportes</button>
+  </div>
+
+  <div class="content">
+    <div id="alert-global" class="alert"></div>
+
+    <div class="tab-content active" id="tab-dashboard">
+      <div id="cobrador-banner-dash" class="cobrador-banner" style="display:none;">
+        Sesión activa como <b>Cobradora</b> — Acceso limitado a registro de pagos y consulta de clientes
+      </div>
+      <div class="stats-grid" id="stats-container"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div class="section">
+          <div class="section-header"><span class="section-title">Recaudación mensual</span></div>
+          <div class="section-body"><div class="chart-bar-wrap" id="chart-mensual"></div></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><span class="section-title">Últimos pagos</span></div>
+          <div class="section-body" style="padding:0;">
+            <table><thead><tr><th>Cliente</th><th>Monto</th><th>Fecha</th><th>WhatsApp</th></tr></thead>
+            <tbody id="tabla-recientes"></tbody></table>
+          </div>
+        </div>
+      </div>
+      <div class="section" id="vencidos-dash-section">
+        <div class="section-header"><span class="section-title">Cuentas vencidas</span><button class="btn btn-sm" onclick="switchTab('vencidos')">Ver todos →</button></div>
+        <div class="section-body" style="padding:0;">
+          <table><thead><tr><th>N° cuenta</th><th>Cliente</th><th>Deuda</th><th>Días venc.</th><th>Acción</th></tr></thead>
+          <tbody id="tabla-vencidos-dash"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-clientes">
+      <div id="sec-nuevo-cliente" class="section" style="margin-bottom:1rem;">
+        <div class="section-header"><span class="section-title">Nuevo cliente</span><button class="btn btn-sm" id="btn-toggle-nc" onclick="toggleNuevoCliente()">+ Agregar</button></div>
+        <div id="form-nuevo-cliente" style="display:none;" class="section-body">
+          <div class="form-grid" style="margin-bottom:12px;">
+            <div class="form-group"><label class="form-label">Nombre completo *</label><input class="form-input" id="nc-nombre" placeholder="Ej: Juan Pérez García"></div>
+            <div class="form-group"><label class="form-label">Cédula *</label><input class="form-input" id="nc-ci" placeholder="4.123.456"></div>
+            <div class="form-group"><label class="form-label">Teléfono / WhatsApp</label><input class="form-input" id="nc-tel" placeholder="0981 123 456"></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="nc-email" placeholder="correo@ejemplo.com"></div>
+            <div class="form-group"><label class="form-label">Dirección *</label><input class="form-input" id="nc-dir" placeholder="Calle, N°, barrio"></div>
+            <div class="form-group"><label class="form-label">Zona</label>
+              <select class="form-select" id="nc-zona"><option>Asunción Centro</option><option>Fernando de la Mora</option><option>Lambaré</option><option>Luque</option><option>San Lorenzo</option><option>Mariano Roque Alonso</option></select></div>
+            <div class="form-group"><label class="form-label">Tipo de cuenta</label>
+              <select class="form-select" id="nc-tipo"><option>Residencial</option><option>Comercial</option><option>Industrial</option><option>Municipal</option></select></div>
+            <div class="form-group"><label class="form-label">N° Medidor</label><input class="form-input" id="nc-medidor" placeholder="M-000123"></div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button class="btn" onclick="toggleNuevoCliente()">Cancelar</button>
+            <button class="btn btn-primary" onclick="guardarCliente()">Guardar cliente</button>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header"><span class="section-title">Listado de clientes</span><span style="font-size:12px;color:var(--color-text-secondary);" id="total-clientes-label"></span></div>
+        <div class="section-body">
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <div class="search-wrap">
+              <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input class="search-input" id="buscar-cliente" placeholder="Buscar por nombre, CI o N° cuenta..." oninput="filtrarClientes()">
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table><thead><tr><th>N° Cuenta</th><th>Cliente</th><th>CI</th><th>Teléfono</th><th>Zona</th><th>Estado</th><th>Saldo</th><th>Acción</th></tr></thead>
+            <tbody id="tabla-clientes"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-pagos">
+      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:1rem;">
+        <div>
+          <div class="section" style="margin-bottom:1rem;">
+            <div class="section-header"><span class="section-title">Buscar cliente</span></div>
+            <div class="section-body">
+              <div class="form-group" style="margin-bottom:12px;">
+                <label class="form-label">N° cuenta, CI o nombre</label>
+                <div style="display:flex;gap:8px;">
+                  <input class="form-input" id="buscar-pago-cli" placeholder="Ingrese datos del cliente..." style="flex:1;">
+                  <button class="btn btn-primary" onclick="buscarClientePago()">Buscar</button>
+                </div>
+              </div>
+              <div id="cliente-pago-info" style="display:none;"><div id="cliente-pago-detalle"></div></div>
+            </div>
+          </div>
+          <div class="section" id="form-pago-section" style="display:none;">
+            <div class="section-header"><span class="section-title">Detalles del pago</span></div>
+            <div class="section-body">
+              <div class="form-grid" style="margin-bottom:12px;">
+                <div class="form-group"><label class="form-label">Concepto</label>
+                  <select class="form-select" id="pago-concepto" onchange="actualizarConcepto()">
+                    <option value="servicio_agua">Servicio de agua</option>
+                    <option value="reconexion">Reconexión</option>
+                    <option value="multa">Multa / Mora</option>
+                    <option value="medidor">Cambio de medidor</option>
+                    <option value="otro">Otro concepto</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Período</label><input class="form-input" id="pago-periodo" placeholder="Ej: Enero 2025"></div>
+                <div class="form-group"><label class="form-label">Monto (Gs.) *</label>
+                  <div class="amount-wrap"><span class="amount-prefix">Gs.</span><input class="form-input amount-input" id="pago-monto" type="number" placeholder="0" oninput="actualizarRecibo()" min="0"></div>
+                </div>
+                <div class="form-group"><label class="form-label">Recargo / Mora (Gs.)</label>
+                  <div class="amount-wrap"><span class="amount-prefix">Gs.</span><input class="form-input amount-input" id="pago-recargo" type="number" value="0" oninput="actualizarRecibo()" min="0"></div>
+                </div>
+                <div class="form-group"><label class="form-label">Descuento (Gs.)</label>
+                  <div class="amount-wrap"><span class="amount-prefix">Gs.</span><input class="form-input amount-input" id="pago-descuento" type="number" value="0" oninput="actualizarRecibo()" min="0"></div>
+                </div>
+                <div class="form-group"><label class="form-label">Forma de pago</label>
+                  <select class="form-select" id="pago-forma"><option>Efectivo</option><option>Transferencia bancaria</option><option>Tarjeta de débito</option><option>Tarjeta de crédito</option><option>Billetera digital</option></select>
+                </div>
+                <div class="form-group form-full"><label class="form-label">Teléfono WhatsApp del cliente</label>
+                  <input class="form-input" id="pago-wa-tel" placeholder="Ej: 0981 123 456 (para envío del comprobante)">
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;">
+                <button class="btn" onclick="limpiarPago()">Limpiar</button>
+                <button class="btn btn-success" onclick="procesarPago()">Procesar pago ✓</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section" id="preview-recibo">
+          <div class="section-header"><span class="section-title">Vista previa — recibo</span></div>
+          <div class="section-body">
+            <div id="recibo-preview-content" style="color:var(--color-text-secondary);font-size:13px;text-align:center;padding:2rem 0;">Busque un cliente para ver el recibo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-historial">
+      <div class="section">
+        <div class="section-header"><span class="section-title">Historial de pagos</span></div>
+        <div class="section-body">
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <div class="search-wrap">
+              <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input class="search-input" id="buscar-historial" placeholder="Buscar cliente o N° recibo..." oninput="filtrarHistorial()">
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table><thead><tr><th>N° Recibo</th><th>Fecha</th><th>Cliente</th><th>Concepto</th><th>Total</th><th>Forma pago</th><th>Cobrador/a</th><th>WhatsApp</th></tr></thead>
+            <tbody id="tabla-historial"></tbody></table>
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--color-text-secondary);" id="total-historial-label"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-vencidos">
+      <div class="stats-grid" id="stats-vencidos"></div>
+      <div class="section" style="margin-top:1rem;">
+        <div class="section-header"><span class="section-title">Cuentas vencidas y en mora</span></div>
+        <div class="section-body" style="padding:0;">
+          <table><thead><tr><th>N° Cuenta</th><th>Cliente</th><th>Teléfono</th><th>Deuda</th><th>Días venc.</th><th>Estado</th><th>Acción</th></tr></thead>
+          <tbody id="tabla-vencidos"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-reportes">
+      <div id="reportes-content"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-pago-rapido">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <div style="font-size:16px;font-weight:500;">Pago rápido</div>
+      <button class="btn btn-sm" onclick="cerrarModal('modal-pago-rapido')">✕</button>
+    </div>
+    <div id="modal-cliente-info" style="margin-bottom:1rem;"></div>
+    <div class="form-group" style="margin-bottom:10px;"><label class="form-label">Monto a cobrar (Gs.) *</label>
+      <div class="amount-wrap"><span class="amount-prefix">Gs.</span><input class="form-input amount-input" id="modal-monto" type="number" placeholder="0" min="0" oninput="actualizarWaPreview()"></div>
+    </div>
+    <div class="form-group" style="margin-bottom:10px;"><label class="form-label">Concepto</label>
+      <select class="form-select" id="modal-concepto" onchange="actualizarWaPreview()">
+        <option value="servicio_agua">Servicio de agua</option><option value="reconexion">Reconexión</option>
+        <option value="multa">Multa / Mora</option><option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:10px;"><label class="form-label">Forma de pago</label>
+      <select class="form-select" id="modal-forma"><option>Efectivo</option><option>Transferencia bancaria</option><option>Tarjeta de débito</option><option>Billetera digital</option></select>
+    </div>
+    <div class="form-group" style="margin-bottom:12px;"><label class="form-label">WhatsApp del cliente (para comprobante)</label>
+      <input class="form-input" id="modal-wa" placeholder="Ej: 0981 123 456" oninput="actualizarWaPreview()">
+    </div>
+    <div id="wa-preview-modal" style="margin-bottom:12px;display:none;">
+      <div class="form-label" style="margin-bottom:4px;">Vista previa del mensaje WhatsApp</div>
+      <div class="wa-preview" id="wa-msg-preview"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn" onclick="cerrarModal('modal-pago-rapido')">Cancelar</button>
+      <button class="btn btn-success" onclick="procesarPagoRapido()">Confirmar pago</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-wa-final">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <div style="font-size:16px;font-weight:500;">Enviar comprobante por WhatsApp</div>
+      <button class="btn btn-sm" onclick="cerrarModal('modal-wa-final')">✕</button>
+    </div>
+    <div id="wa-final-recibo" style="margin-bottom:1rem;"></div>
+    <div class="form-group" style="margin-bottom:8px;"><label class="form-label">Número WhatsApp del cliente</label>
+      <input class="form-input" id="wa-final-numero" placeholder="Ej: 0981 123 456" oninput="actualizarWaFinal()">
+    </div>
+    <div id="wa-final-preview" style="margin-bottom:1rem;display:none;">
+      <div class="form-label" style="margin-bottom:4px;">Mensaje que se enviará</div>
+      <div class="wa-preview" id="wa-final-msg"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn" onclick="cerrarModal('modal-wa-final')">Cerrar</button>
+      <button class="btn btn-wa" id="btn-abrir-wa" onclick="abrirWhatsApp()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Abrir WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const USUARIOS = {
+  admin: { pass: 'admin123', nombre: 'Administrador', rol: 'admin', rolLabel: 'Administrador — Acceso total' },
+  cobrador: { pass: 'cobro2025', nombre: 'Cobradora', rol: 'cobrador', rolLabel: 'Cobradora — Acceso limitado' }
+};
+let sesion = null;
+
+let clientes = [
+  { id:'C-001', nombre:'María González Torres', ci:'3.456.789', tel:'0981 234 567', email:'maria.g@gmail.com', dir:'Gral. Díaz 456, Asunción', zona:'Asunción Centro', tipo:'Residencial', medidor:'M-000456', estado:'Al día', saldo:0, ultimoPago:'2025-01-15' },
+  { id:'C-002', nombre:'Carlos Benítez Mora', ci:'4.123.456', tel:'0971 345 678', email:'cbenitez@gmail.com', dir:'Av. Mariscal López 1200, Fernando', zona:'Fernando de la Mora', tipo:'Comercial', medidor:'M-000789', estado:'Vencido', saldo:450000, ultimoPago:'2024-10-20' },
+  { id:'C-003', nombre:'Ana Ramírez Sosa', ci:'5.678.901', tel:'0991 456 789', email:'', dir:'San Martín 234, Lambaré', zona:'Lambaré', tipo:'Residencial', medidor:'M-001123', estado:'Pendiente', saldo:185000, ultimoPago:'2024-12-05' },
+  { id:'C-004', nombre:'Roberto Flores Acosta', ci:'2.987.654', tel:'0985 567 890', email:'', dir:'Av. Eusebio Ayala 890, San Lorenzo', zona:'San Lorenzo', tipo:'Industrial', medidor:'M-001456', estado:'Vencido', saldo:1250000, ultimoPago:'2024-09-12' },
+  { id:'C-005', nombre:'Lucia Paredes Vda. de Fernández', ci:'1.234.567', tel:'0976 678 901', email:'', dir:'Cerro Corá 567, Asunción', zona:'Asunción Centro', tipo:'Residencial', medidor:'M-001789', estado:'Al día', saldo:0, ultimoPago:'2025-01-18' },
+  { id:'C-006', nombre:'José López Martínez', ci:'6.345.678', tel:'0982 789 012', email:'', dir:'Mcal Estigarribia 120, Luque', zona:'Luque', tipo:'Residencial', medidor:'M-002012', estado:'Vencido', saldo:320000, ultimoPago:'2024-11-08' },
+];
+let pagos = [
+  { id:'R-000001', fecha:new Date(2025,0,18), clienteId:'C-005', clienteNombre:'Lucia Paredes Vda. de Fernández', concepto:'servicio_agua', periodo:'Enero 2025', monto:95000, recargo:0, descuento:0, total:95000, forma:'Efectivo', cobrador:'Administrador', waSent:true },
+  { id:'R-000002', fecha:new Date(2025,0,15), clienteId:'C-001', clienteNombre:'María González Torres', concepto:'servicio_agua', periodo:'Enero 2025', monto:85000, recargo:0, descuento:0, total:85000, forma:'Transferencia bancaria', cobrador:'Administrador', waSent:false },
+  { id:'R-000003', fecha:new Date(2025,0,10), clienteId:'C-001', clienteNombre:'María González Torres', concepto:'servicio_agua', periodo:'Diciembre 2024', monto:82000, recargo:0, descuento:0, total:82000, forma:'Efectivo', cobrador:'Cobradora', waSent:true },
+  { id:'R-000004', fecha:new Date(2024,11,5), clienteId:'C-003', clienteNombre:'Ana Ramírez Sosa', concepto:'servicio_agua', periodo:'Noviembre 2024', monto:78000, recargo:0, descuento:0, total:78000, forma:'Efectivo', cobrador:'Cobradora', waSent:false },
+];
+let reciboCounter = 4;
+let clienteSelPago = null, clienteSelModal = null, ultimoPagoRecibo = null;
+const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const hoy = new Date();
+function fmt(n){return Math.round(n).toLocaleString('es-PY');}
+function fmtGs(n){return 'Gs. '+fmt(n);}
+function fmtF(d){return d.toLocaleDateString('es-PY');}
+function conceptoLabel(c){return {servicio_agua:'Servicio de agua',reconexion:'Reconexión',multa:'Multa/Mora',medidor:'Cambio medidor',otro:'Otro'}[c]||c;}
+function diasVencido(c){if(!c.ultimoPago)return 999;return Math.max(0,Math.floor((hoy-new Date(c.ultimoPago))/86400000)-30);}
+
+let rolSeleccionado = 'admin';
+function selectRole(r){
+  rolSeleccionado = r;
+  document.getElementById('role-admin').classList.toggle('selected', r==='admin');
+  document.getElementById('role-cobrador').classList.toggle('selected', r==='cobrador');
+}
+function doLogin(){
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  const u = rolSeleccionado === 'admin' ? USUARIOS.admin : USUARIOS.cobrador;
+  if(pass !== u.pass){ errEl.style.display='block'; document.getElementById('login-pass').value=''; return; }
+  errEl.style.display='none';
+  sesion = u;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-app').style.display='block';
+  initApp();
+}
+function logout(){
+  sesion=null; clienteSelPago=null; clienteSelModal=null;
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('login-pass').value='';
+}
+function isAdmin(){return sesion && sesion.rol==='admin';}
+
+function initApp(){
+  const ahora = hoy.toLocaleDateString('es-PY',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+  document.getElementById('hdr-fecha').textContent = ahora;
+  document.getElementById('hdr-user').textContent = sesion.nombre;
+  document.getElementById('hdr-role').textContent = sesion.rolLabel;
+  const av = document.getElementById('hdr-avatar');
+  av.textContent = sesion.rol==='admin'?'AD':'CB';
+  av.className = 'user-avatar ' + (sesion.rol==='admin'?'avatar-admin':'avatar-cobrador');
+  const tabs = ['dashboard','clientes','pagos','historial','vencidos','reportes'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('nav-'+t);
+    if(!btn) return;
+    if(sesion.rol==='cobrador' && !['dashboard','clientes','pagos'].includes(t)){
+      btn.disabled=true;
+    } else { btn.disabled=false; }
+  });
+  document.getElementById('cobrador-banner-dash').style.display = isAdmin() ? 'none' : 'flex';
+  const ncSection = document.getElementById('sec-nuevo-cliente');
+  if(ncSection) ncSection.style.display = isAdmin() ? 'block' : 'none';
+  switchTab('dashboard');
+}
+
+function showAlert(msg,tipo){
+  const el=document.getElementById('alert-global');
+  el.className='alert show alert-'+tipo; el.textContent=msg;
+  setTimeout(()=>el.classList.remove('show'),4500);
+}
+
+function switchTab(t){
+  if(sesion.rol==='cobrador' && !['dashboard','clientes','pagos'].includes(t)){ showAlert('Acceso restringido. No tiene permiso para esta sección.','error'); return; }
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  const btn = document.getElementById('nav-'+t);
+  if(btn && !btn.disabled) btn.classList.add('active');
+  if(t==='dashboard') renderDashboard();
+  if(t==='clientes') renderClientes();
+  if(t==='historial') renderHistorial();
+  if(t==='vencidos') renderVencidos();
+  if(t==='reportes') renderReportes();
+}
+
+function renderDashboard(){
+  const totalMes = pagos.filter(p=>p.fecha.getMonth()===hoy.getMonth()&&p.fecha.getFullYear()===hoy.getFullYear()).reduce((s,p)=>s+p.total,0);
+  const totalDeuda = clientes.reduce((s,c)=>s+(c.saldo||0),0);
+  const venc = clientes.filter(c=>c.estado==='Vencido'||c.estado==='Pendiente').length;
+  const alDia = clientes.filter(c=>c.estado==='Al día').length;
+  document.getElementById('stats-container').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Recaudado este mes</div><div class="stat-value stat-green">Gs. ${fmt(totalMes)}</div><div class="stat-sub">${pagos.filter(p=>p.fecha.getMonth()===hoy.getMonth()).length} pagos</div></div>
+    <div class="stat-card"><div class="stat-label">Total en mora</div><div class="stat-value stat-red">Gs. ${fmt(totalDeuda)}</div><div class="stat-sub">${venc} cuentas</div></div>
+    <div class="stat-card"><div class="stat-label">Al día</div><div class="stat-value stat-blue">${alDia}</div><div class="stat-sub">de ${clientes.length} clientes</div></div>
+    <div class="stat-card"><div class="stat-label">Total clientes</div><div class="stat-value">${clientes.length}</div><div class="stat-sub">registrados</div></div>`;
+  const mesesD=[];
+  for(let i=5;i>=0;i--){const m=(hoy.getMonth()-i+12)%12;const y=hoy.getFullYear()-(hoy.getMonth()-i<0?1:0);const tot=pagos.filter(p=>p.fecha.getMonth()===m&&p.fecha.getFullYear()===y).reduce((s,p)=>s+p.total,0);mesesD.push({label:meses[m].substring(0,3),total:tot});}
+  const maxV=Math.max(...mesesD.map(d=>d.total),1);
+  document.getElementById('chart-mensual').innerHTML=mesesD.map(d=>`<div class="chart-row"><span class="chart-label">${d.label}</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round(d.total/maxV*100)}%;background:#185FA5;"></div></div><span class="chart-val">${fmtGs(d.total)}</span></div>`).join('');
+  const recientes=pagos.slice().sort((a,b)=>b.fecha-a.fecha).slice(0,5);
+  document.getElementById('tabla-recientes').innerHTML=recientes.map(p=>`<tr><td>${p.clienteNombre.split(' ').slice(0,2).join(' ')}</td><td>${fmtGs(p.total)}</td><td>${fmtF(p.fecha)}</td><td><button class="btn btn-sm btn-wa" onclick="abrirWaFinal('${p.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Enviar</button></td></tr>`).join('');
+  const vList=clientes.filter(c=>c.estado==='Vencido'||c.estado==='Pendiente').slice(0,4);
+  document.getElementById('tabla-vencidos-dash').innerHTML=vList.map(c=>`<tr><td><b>${c.id}</b></td><td>${c.nombre}</td><td style="color:#A32D2D;font-weight:500;">${fmtGs(c.saldo)}</td><td><span class="corte-badge">${diasVencido(c)}d</span></td><td><button class="btn btn-sm btn-primary" onclick="abrirPagoRapido('${c.id}')">Cobrar</button></td></tr>`).join('');
+}
+
+function renderClientes(lista){
+  const fl=lista||clientes;
+  document.getElementById('total-clientes-label').textContent=fl.length+' clientes';
+  document.getElementById('tabla-clientes').innerHTML=fl.map(c=>`<tr>
+    <td><b>${c.id}</b></td><td>${c.nombre}</td><td>${c.ci}</td>
+    <td>${c.tel||'—'}</td><td>${c.zona}</td>
+    <td><span class="status-badge status-${c.estado==='Al día'?'al-dia':c.estado==='Vencido'?'vencido':'pendiente'}">${c.estado}</span></td>
+    <td style="color:${c.saldo>0?'#A32D2D':'#3B6D11'};font-weight:500;">${c.saldo>0?fmtGs(c.saldo):'Al día'}</td>
+    <td><button class="btn btn-sm btn-primary" onclick="abrirPagoRapido('${c.id}')">Cobrar</button></td></tr>`).join('');
+}
+function filtrarClientes(){
+  const q=document.getElementById('buscar-cliente').value.toLowerCase();
+  renderClientes(clientes.filter(c=>!q||c.nombre.toLowerCase().includes(q)||c.ci.includes(q)||c.id.toLowerCase().includes(q)));
+}
+function toggleNuevoCliente(){const f=document.getElementById('form-nuevo-cliente');f.style.display=f.style.display==='none'?'block':'none';}
+function guardarCliente(){
+  if(!isAdmin()){showAlert('Sin permiso','error');return;}
+  const nombre=document.getElementById('nc-nombre').value.trim();
+  const ci=document.getElementById('nc-ci').value.trim();
+  const dir=document.getElementById('nc-dir').value.trim();
+  if(!nombre||!ci||!dir){showAlert('Complete los campos obligatorios (*)','error');return;}
+  const newId='C-'+String(clientes.length+1).padStart(3,'0');
+  clientes.push({id:newId,nombre,ci,tel:document.getElementById('nc-tel').value,email:document.getElementById('nc-email').value,dir,zona:document.getElementById('nc-zona').value,tipo:document.getElementById('nc-tipo').value,medidor:document.getElementById('nc-medidor').value||'M-PENDIENTE',estado:'Al día',saldo:0,ultimoPago:null});
+  ['nc-nombre','nc-ci','nc-tel','nc-email','nc-dir','nc-medidor'].forEach(id=>document.getElementById(id).value='');
+  toggleNuevoCliente();
+  showAlert('Cliente '+nombre+' registrado con N° '+newId,'success');
+  renderClientes();
+}
+
+function buscarClientePago(){
+  const q=document.getElementById('buscar-pago-cli').value.trim().toLowerCase();
+  const c=clientes.find(x=>x.id.toLowerCase()===q||x.nombre.toLowerCase().includes(q)||x.ci.includes(q));
+  if(!c){showAlert('Cliente no encontrado','error');return;}
+  clienteSelPago=c;
+  document.getElementById('pago-wa-tel').value=c.tel||'';
+  document.getElementById('pago-periodo').value=meses[hoy.getMonth()]+' '+hoy.getFullYear();
+  document.getElementById('cliente-pago-info').style.display='block';
+  document.getElementById('form-pago-section').style.display='block';
+  document.getElementById('cliente-pago-detalle').innerHTML=`<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;font-size:13px;">
+    <div class="info-row"><span class="info-key">N° Cuenta</span><span class="info-val">${c.id}</span></div>
+    <div class="info-row"><span class="info-key">Cliente</span><span class="info-val">${c.nombre}</span></div>
+    <div class="info-row"><span class="info-key">C.I.</span><span class="info-val">${c.ci}</span></div>
+    <div class="info-row"><span class="info-key">Teléfono</span><span class="info-val">${c.tel||'—'}</span></div>
+    <div class="info-row"><span class="info-key">Dirección</span><span class="info-val">${c.dir}</span></div>
+    <div class="info-row"><span class="info-key">Estado</span><span class="info-val"><span class="status-badge status-${c.estado==='Al día'?'al-dia':c.estado==='Vencido'?'vencido':'pendiente'}">${c.estado}</span></span></div>
+    ${c.saldo>0?`<div class="info-row"><span class="info-key">Saldo pendiente</span><span class="info-val" style="color:#A32D2D;">${fmtGs(c.saldo)}</span></div>`:''}
+  </div>`;
+  actualizarRecibo();
+}
+
+function actualizarConcepto(){
+  const m={servicio_agua:95000,reconexion:150000,multa:50000,medidor:250000,otro:0};
+  document.getElementById('pago-monto').value=m[document.getElementById('pago-concepto').value]||'';
+  actualizarRecibo();
+}
+
+function generarMensajeWA(recibo, cli, tel){
+  const num = tel ? tel.replace(/\D/g,'') : '';
+  const prefijo = num.startsWith('595') ? num : num.startsWith('0') ? '595'+num.substring(1) : '595'+num;
+  const msg = `*CORPOSANA - Comprobante de Pago*\n\nEstimado/a *${cli.nombre}*,\n\nSe registró su pago exitosamente:\n\n📋 *N° Recibo:* ${recibo.id}\n📅 *Fecha:* ${fmtF(recibo.fecha)}\n🏠 *N° Cuenta:* ${cli.id}\n💧 *Concepto:* ${conceptoLabel(recibo.concepto)}\n📆 *Período:* ${recibo.periodo}\n\n💵 *Monto:* Gs. ${fmt(recibo.monto)}${recibo.recargo>0?`\n⚠️ *Recargo:* Gs. ${fmt(recibo.recargo)}`:''}${recibo.descuento>0?`\n✅ *Descuento:* Gs. ${fmt(recibo.descuento)}`:''}\n💳 *TOTAL PAGADO: Gs. ${fmt(recibo.total)}*\n\n📌 *Forma de pago:* ${recibo.forma}\n\nGracias por su pago. CORPOSANA le agradece su puntualidad.`;
+  return { msg, prefijo };
+}
+
+function actualizarRecibo(){
+  if(!clienteSelPago) return;
+  const monto=parseFloat(document.getElementById('pago-monto').value)||0;
+  const recargo=parseFloat(document.getElementById('pago-recargo').value)||0;
+  const desc=parseFloat(document.getElementById('pago-descuento').value)||0;
+  const total=monto+recargo-desc;
+  const concepto=document.getElementById('pago-concepto').value;
+  const periodo=document.getElementById('pago-periodo').value;
+  const nR='R-'+String(reciboCounter+1).padStart(6,'0');
+  document.getElementById('recibo-preview-content').innerHTML=`
+    <div class="recibo-box">
+      <div class="recibo-header">CORPOSANA<br>Comprobante de Pago N° ${nR}</div>
+      <div style="border-top:0.5px solid var(--color-border-tertiary);margin:8px 0;"></div>
+      <div class="recibo-line"><span>Fecha:</span><span>${fmtF(hoy)}</span></div>
+      <div class="recibo-line"><span>N° Cuenta:</span><span>${clienteSelPago.id}</span></div>
+      <div class="recibo-line"><span>Cliente:</span><span style="max-width:160px;text-align:right;font-size:11px;">${clienteSelPago.nombre}</span></div>
+      <div class="recibo-line"><span>Concepto:</span><span>${conceptoLabel(concepto)}</span></div>
+      <div class="recibo-line"><span>Período:</span><span>${periodo}</span></div>
+      <div style="border-top:0.5px solid var(--color-border-tertiary);margin:8px 0;"></div>
+      <div class="recibo-line"><span>Monto base:</span><span>${fmtGs(monto)}</span></div>
+      ${recargo>0?`<div class="recibo-line"><span>Recargo:</span><span style="color:#A32D2D;">+ ${fmtGs(recargo)}</span></div>`:''}
+      ${desc>0?`<div class="recibo-line"><span>Descuento:</span><span style="color:#3B6D11;">- ${fmtGs(desc)}</span></div>`:''}
+      <div class="recibo-line recibo-total"><span>TOTAL:</span><span style="color:#185FA5;font-size:15px;">${fmtGs(total)}</span></div>
+      <div style="margin-top:10px;text-align:center;font-size:10px;color:var(--color-text-secondary);">Corporación de Obras Sanitarias del Paraguay</div>
+    </div>
+    <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+      <div style="font-size:11px;color:var(--color-text-secondary);">Cobrado por: <b>${sesion.nombre}</b></div>
+    </div>`;
+}
+
+function procesarPago(){
+  if(!clienteSelPago){showAlert('Seleccione un cliente','error');return;}
+  const monto=parseFloat(document.getElementById('pago-monto').value)||0;
+  if(monto<=0){showAlert('Ingrese un monto válido','error');return;}
+  const recargo=parseFloat(document.getElementById('pago-recargo').value)||0;
+  const desc=parseFloat(document.getElementById('pago-descuento').value)||0;
+  const total=monto+recargo-desc;
+  const waTel=document.getElementById('pago-wa-tel').value;
+  reciboCounter++;
+  const recibo={id:'R-'+String(reciboCounter).padStart(6,'0'),fecha:new Date(),clienteId:clienteSelPago.id,clienteNombre:clienteSelPago.nombre,concepto:document.getElementById('pago-concepto').value,periodo:document.getElementById('pago-periodo').value,monto,recargo,descuento:desc,total,forma:document.getElementById('pago-forma').value,cobrador:sesion.nombre,waSent:false};
+  pagos.unshift(recibo);
+  const cli=clientes.find(c=>c.id===clienteSelPago.id);
+  if(cli){cli.saldo=Math.max(0,cli.saldo-total);cli.ultimoPago=hoy.toISOString().split('T')[0];cli.estado=cli.saldo<=0?'Al día':'Pendiente';}
+  showAlert('Pago procesado. Recibo '+recibo.id+' generado.','success');
+  ultimoPagoRecibo={recibo, cli, tel:waTel};
+  limpiarPago();
+  if(waTel) abrirWaFinalDirecto(recibo, cli, waTel);
+}
+
+function limpiarPago(){
+  clienteSelPago=null;
+  ['buscar-pago-cli','pago-monto','pago-obs','pago-wa-tel'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['pago-recargo','pago-descuento'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='0';});
+  document.getElementById('cliente-pago-info').style.display='none';
+  document.getElementById('form-pago-section').style.display='none';
+  document.getElementById('recibo-preview-content').innerHTML='<div style="color:var(--color-text-secondary);font-size:13px;text-align:center;padding:2rem 0;">Busque un cliente para ver el recibo</div>';
+}
+
+function renderHistorial(lista){
+  const fl=lista||pagos;
+  document.getElementById('tabla-historial').innerHTML=fl.map(p=>`<tr>
+    <td><b>${p.id}</b></td><td>${fmtF(p.fecha)}</td><td>${p.clienteNombre}</td>
+    <td>${conceptoLabel(p.concepto)}</td>
+    <td style="font-weight:500;">${fmtGs(p.total)}</td>
+    <td>${p.forma}</td>
+    <td><span class="${p.cobrador==='Administrador'?'badge-admin':'badge-cobrador'}">${p.cobrador}</span></td>
+    <td><button class="btn btn-sm btn-wa" onclick="abrirWaFinal('${p.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WA</button></td>
+  </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--color-text-secondary);padding:2rem;">Sin registros</td></tr>';
+  document.getElementById('total-historial-label').textContent=fl.length+' registros — Total: '+fmtGs(fl.reduce((s,p)=>s+p.total,0));
+}
+function filtrarHistorial(){
+  const q=document.getElementById('buscar-historial').value.toLowerCase();
+  renderHistorial(pagos.filter(p=>!q||p.clienteNombre.toLowerCase().includes(q)||p.id.toLowerCase().includes(q)));
+}
+
+function renderVencidos(){
+  const vList=clientes.filter(c=>c.estado==='Vencido'||c.estado==='Pendiente');
+  const totalD=vList.reduce((s,c)=>s+c.saldo,0);
+  document.getElementById('stats-vencidos').innerHTML=`
+    <div class="stat-card"><div class="stat-label">En mora</div><div class="stat-value stat-red">${vList.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Deuda total</div><div class="stat-value stat-red">Gs. ${fmt(totalD)}</div></div>
+    <div class="stat-card"><div class="stat-label">+90 días</div><div class="stat-value">${vList.filter(c=>diasVencido(c)>90).length}</div></div>
+    <div class="stat-card"><div class="stat-label">Riesgo corte</div><div class="stat-value stat-red">${vList.filter(c=>diasVencido(c)>60).length}</div></div>`;
+  document.getElementById('tabla-vencidos').innerHTML=vList.map(c=>`<tr>
+    <td><b>${c.id}</b></td><td>${c.nombre}</td><td>${c.tel||'—'}</td>
+    <td style="color:#A32D2D;font-weight:500;">${fmtGs(c.saldo)}</td>
+    <td><span class="corte-badge">${diasVencido(c)} días</span></td>
+    <td><span class="status-badge status-${c.estado==='Vencido'?'vencido':'pendiente'}">${c.estado}</span></td>
+    <td style="display:flex;gap:6px;">
+      <button class="btn btn-sm btn-primary" onclick="abrirPagoRapido('${c.id}')">Cobrar</button>
+      <button class="btn btn-sm btn-wa" onclick="enviarAviso('${c.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Aviso</button>
+    </td></tr>`).join('');
+}
+
+function enviarAviso(cid){
+  const c=clientes.find(x=>x.id===cid);
+  if(!c)return;
+  const tel=(c.tel||'').replace(/\D/g,'');
+  const prefijo=tel.startsWith('595')?tel:tel.startsWith('0')?'595'+tel.substring(1):'595'+tel;
+  const msg=encodeURIComponent(`*CORPOSANA — Aviso de deuda*\n\nEstimado/a *${c.nombre}*,\n\nLe recordamos que su cuenta N° *${c.id}* registra un saldo pendiente de *Gs. ${fmt(c.saldo)}*.\n\nLe solicitamos regularizar su situación a la brevedad para evitar la suspensión del servicio.\n\nPara consultas: CORPOSANA — Asunción, Paraguay.`);
+  openLink('https://wa.me/'+prefijo+'?text='+msg);
+}
+
+function renderReportes(){
+  if(!isAdmin()){document.getElementById('reportes-content').innerHTML='<div class="locked-overlay">Acceso restringido. Solo el administrador puede ver los reportes.</div>';return;}
+  const zonas={};const tipos={};
+  pagos.forEach(p=>{const cli=clientes.find(c=>c.id===p.clienteId);if(cli){zonas[cli.zona]=(zonas[cli.zona]||0)+p.total;tipos[cli.tipo]=(tipos[cli.tipo]||0)+p.total;}});
+  const cols=['#185FA5','#3B6D11','#854F0B','#A32D2D','#533AB7'];
+  const maxZ=Math.max(...Object.values(zonas),1);const maxT=Math.max(...Object.values(tipos),1);
+  const totalMes=pagos.filter(p=>p.fecha.getMonth()===hoy.getMonth()).reduce((s,p)=>s+p.total,0);
+  const totalDeuda=clientes.reduce((s,c)=>s+c.saldo,0);
+  document.getElementById('reportes-content').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+      <div class="section"><div class="section-header"><span class="section-title">Recaudación por zona</span></div><div class="section-body"><div class="chart-bar-wrap">${Object.entries(zonas).sort((a,b)=>b[1]-a[1]).map(([z,v],i)=>`<div class="chart-row"><span class="chart-label">${z.split(' ')[0]}</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round(v/maxZ*100)}%;background:${cols[i%cols.length]};"></div></div><span class="chart-val">${fmtGs(v)}</span></div>`).join('')}</div></div></div>
+      <div class="section"><div class="section-header"><span class="section-title">Por tipo de cuenta</span></div><div class="section-body"><div class="chart-bar-wrap">${Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,v],i)=>`<div class="chart-row"><span class="chart-label">${t.substring(0,8)}</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round(v/maxT*100)}%;background:${cols[i%cols.length]};"></div></div><span class="chart-val">${fmtGs(v)}</span></div>`).join('')}</div></div></div>
+    </div>
+    <div class="section"><div class="section-header"><span class="section-title">Resumen ejecutivo</span><button class="btn btn-sm btn-primary" onclick="sendPrompt('Analiza los datos del sistema de pagos CORPOSANA y dame recomendaciones')">Analizar con IA ↗</button></div>
+    <div class="section-body"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+      <div><div style="font-size:12px;color:var(--color-text-secondary);">Recaudación del mes</div><div style="font-size:20px;font-weight:500;color:#3B6D11;">Gs. ${fmt(totalMes)}</div></div>
+      <div><div style="font-size:12px;color:var(--color-text-secondary);">Deuda acumulada</div><div style="font-size:20px;font-weight:500;color:#A32D2D;">Gs. ${fmt(totalDeuda)}</div></div>
+      <div><div style="font-size:12px;color:var(--color-text-secondary);">Eficiencia de cobro</div><div style="font-size:20px;font-weight:500;color:#185FA5;">${Math.round(totalMes/(totalMes+totalDeuda)*100)}%</div></div>
+    </div></div></div>`;
+}
+
+function abrirPagoRapido(cid){
+  clienteSelModal=clientes.find(c=>c.id===cid);
+  if(!clienteSelModal)return;
+  const c=clienteSelModal;
+  document.getElementById('modal-cliente-info').innerHTML=`<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;font-size:12px;">
+    <div class="info-row"><span class="info-key">Cliente</span><span class="info-val">${c.nombre}</span></div>
+    <div class="info-row"><span class="info-key">N° Cuenta</span><span class="info-val">${c.id}</span></div>
+    ${c.saldo>0?`<div class="info-row"><span class="info-key">Saldo pendiente</span><span class="info-val" style="color:#A32D2D;">${fmtGs(c.saldo)}</span></div>`:''}
+  </div>`;
+  document.getElementById('modal-monto').value=c.saldo>0?c.saldo:95000;
+  document.getElementById('modal-wa').value=c.tel||'';
+  actualizarWaPreview();
+  document.getElementById('modal-pago-rapido').classList.add('open');
+}
+function cerrarModal(id){document.getElementById(id).classList.remove('open');}
+
+function actualizarWaPreview(){
+  const tel=document.getElementById('modal-wa').value;
+  const monto=parseFloat(document.getElementById('modal-monto').value)||0;
+  const prev=document.getElementById('wa-preview-modal');
+  const msg=document.getElementById('wa-msg-preview');
+  if(!tel||!monto){prev.style.display='none';return;}
+  prev.style.display='block';
+  const concepto=document.getElementById('modal-concepto').value;
+  const nR='R-'+String(reciboCounter+1).padStart(6,'0');
+  msg.textContent=`CORPOSANA - Comprobante de Pago\n\nEstimado/a ${clienteSelModal?clienteSelModal.nombre:'Cliente'},\n\nRecibo N° ${nR}\nConcepto: ${conceptoLabel(concepto)}\nTotal pagado: Gs. ${fmt(monto)}\nFecha: ${fmtF(hoy)}\n\nGracias por su pago.`;
+}
+
+function procesarPagoRapido(){
+  if(!clienteSelModal)return;
+  const monto=parseFloat(document.getElementById('modal-monto').value)||0;
+  if(monto<=0){showAlert('Ingrese un monto válido','error');cerrarModal('modal-pago-rapido');return;}
+  const waTel=document.getElementById('modal-wa').value;
+  reciboCounter++;
+  const recibo={id:'R-'+String(reciboCounter).padStart(6,'0'),fecha:new Date(),clienteId:clienteSelModal.id,clienteNombre:clienteSelModal.nombre,concepto:document.getElementById('modal-concepto').value,periodo:meses[hoy.getMonth()]+' '+hoy.getFullYear(),monto,recargo:0,descuento:0,total:monto,forma:document.getElementById('modal-forma').value,cobrador:sesion.nombre,waSent:false};
+  pagos.unshift(recibo);
+  const cli=clientes.find(c=>c.id===clienteSelModal.id);
+  if(cli){cli.saldo=Math.max(0,cli.saldo-monto);cli.ultimoPago=hoy.toISOString().split('T')[0];cli.estado=cli.saldo<=0?'Al día':'Pendiente';}
+  cerrarModal('modal-pago-rapido');
+  showAlert('Pago de Gs. '+fmt(monto)+' procesado. Recibo '+recibo.id,'success');
+  if(waTel) abrirWaFinalDirecto(recibo,cli,waTel);
+  renderDashboard();
+}
+
+function abrirWaFinal(pagoId){
+  const p=pagos.find(x=>x.id===pagoId);
+  if(!p)return;
+  const cli=clientes.find(c=>c.id===p.clienteId);
+  abrirWaFinalDirecto(p,cli,cli?cli.tel:'');
+}
+
+function abrirWaFinalDirecto(recibo, cli, tel){
+  document.getElementById('wa-final-recibo').innerHTML=`<div class="recibo-box">
+    <div class="recibo-header">Comprobante — ${recibo.id}</div>
+    <div class="recibo-line"><span>Cliente:</span><span>${recibo.clienteNombre}</span></div>
+    <div class="recibo-line"><span>Concepto:</span><span>${conceptoLabel(recibo.concepto)}</span></div>
+    <div class="recibo-line"><span>Período:</span><span>${recibo.periodo}</span></div>
+    <div class="recibo-line recibo-total"><span>Total pagado:</span><span style="color:#185FA5;">${fmtGs(recibo.total)}</span></div>
+  </div>`;
+  document.getElementById('wa-final-numero').value=tel||'';
+  const el=document.getElementById('wa-final-preview');el.style.display='none';
+  document.getElementById('modal-wa-final').setAttribute('data-recibo-id', recibo.id);
+  document.getElementById('modal-wa-final').classList.add('open');
+  actualizarWaFinal();
+}
+
+function actualizarWaFinal(){
+  const tel=document.getElementById('wa-final-numero').value;
+  const pagoId=document.getElementById('modal-wa-final').getAttribute('data-recibo-id');
+  const p=pagos.find(x=>x.id===pagoId);
+  const cli=p?clientes.find(c=>c.id===p.clienteId):null;
+  const prev=document.getElementById('wa-final-preview');
+  const msgEl=document.getElementById('wa-final-msg');
+  if(!tel||!p||!cli){prev.style.display='none';return;}
+  prev.style.display='block';
+  const {msg}=generarMensajeWA(p,cli,tel);
+  msgEl.textContent=msg;
+}
+
+function abrirWhatsApp(){
+  const tel=document.getElementById('wa-final-numero').value;
+  const pagoId=document.getElementById('modal-wa-final').getAttribute('data-recibo-id');
+  const p=pagos.find(x=>x.id===pagoId);
+  const cli=p?clientes.find(c=>c.id===p.clienteId):null;
+  if(!tel||!p||!cli){showAlert('Ingrese el número de WhatsApp del cliente','error');return;}
+  const {msg,prefijo}=generarMensajeWA(p,cli,tel);
+  const idx=pagos.findIndex(x=>x.id===pagoId);
+  if(idx>=0)pagos[idx].waSent=true;
+  cerrarModal('modal-wa-final');
+  showAlert('Abriendo WhatsApp para enviar comprobante al cliente...','success');
+  openLink('https://wa.me/'+prefijo+'?text='+encodeURIComponent(msg));
+}
+</script>
