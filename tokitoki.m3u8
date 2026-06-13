@@ -85,4 +85,172 @@ http://playtvch.lat:2082/595983342777py/030626py/137219
 http://playtvch.lat:2082/595983342777py/030626py/137220
 #EXTINF:-1 tvg-id="" tvg-name="A24 (Paraguay)" tvg-logo="https://i.postimg.cc/FK7ptD4d/Sin-titulo.jpg" group-title="PARAGUAY",A24 (Paraguay)
 http://playtvch.lat:2082/595983342777py/030626py/137221
+#EXTINF:-1 tvg-id="ESPN.ar" tvg-name="ESPN Argentina 1 " tvg-logo="https://i.postimg.cc/gkRW1qcD/e748f3c0-3f7c-3088-a90a-0ccb2588e0ed.png" group-title="DEPORTES",ESPN Argentina 1 
+http://playtvch.lat:2082/595983342777py/030626py/51157
+#EXTINF:-1 tvg-id="ESPN.ar" tvg-name="ESPN Argentina 1 HD" tvg-logo="https://i.postimg.cc/gkRW1qcD/e748f3c0-3f7c-3088-a90a-0ccb2588e0ed.png" group-title="DEPORTES",ESPN Argentina 1 HD
+http://playtvch.lat:2082/595983342777py/030626py/51155
+#EXTINF:-1 tvg-id="ESPN.ar" tvg-name="ESPN Argentina 1 FHD" tvg-logo="https://i.postimg.cc/gkRW1qcD/e748f3c0-3f7c-3088-a90a-0ccb2588e0ed.png" group-title="DEPORTES",ESPN Argentina 1 FHD
+http://playtvch.lat:2082/595983342777py/030626py/51154
+#EXTINF:-1 tvg-id="ESPN 2.ar" tvg-name="ESPN Argentina 2 " tvg-logo="https://i.postimg.cc/DZK8nWWp/espn2.png" group-title="DEPORTES",ESPN Argentina 2 
+http://playtvch.lat:2082/595983342777py/030626py/51158
+#EXTINF:-1 tvg-id="ESPN 2.ar" tvg-name="ESPN Argentina 2 HD" tvg-logo="https://i.postimg.cc/DZK8nWWp/espn2.png" group-title="DEPORTES",ESPN Argentina 2 HD
+http://playtvch.lat:2082/595983342777py/030626py/51156
+#EXTINF:-1 tvg-id="ESPN 3.ar" tvg-name="ESPN Argentina 3" tvg-logo="https://i.postimg.cc/wvc3v6Lq/espn3.png" group-title="DEPORTES",ESPN Argentina 3
+http://playtvch.lat:2082/595983342777py/030626py/5601
+#EXTINF:-1 tvg-id="ESPN 3.ar" tvg-name="ESPN Argentina 3 HD" tvg-logo="https://i.postimg.cc/wvc3v6Lq/espn3.png" group-title="DEPORTES",ESPN Argentina 3 HD
+http://playtvch.lat:2082/595983342777py/030626py/31026
+#EXTINF:-1 tvg-id="ESPN PREMIUM.ar" tvg-name="Espn Premium Argentina" tvg-logo="https://r2.thesportsdb.com/images/media/channel/logo/7zpcyf1707916649.png" group-title="DEPORTES",Espn Premium Argentina
+http://playtvch.lat:2082/595983342777py/030626py/6463
+#EXTINF:-1 tvg-id="ESPN PREMIUM.ar" tvg-name="Espn Premium Argentina HD" tvg-logo="https://r2.thesportsdb.com/images/media/channel/logo/7zpcyf1707916649.png" group-title="DEPORTES",Espn Premium Argentina HD
+http://playtvch.lat:2082/595983342777py/030626py/3085
+#EXTINF:-1 tvg-id="ESPN 4.cl" tvg-name="ESPN 4" tvg-logo="https://i.postimg.cc/Dfcvzc3w/61a4c896fc740bb1476f0225-LOGO-ESPN4-2.png" group-title="DEPORTES",ESPN 4
+http://playtvch.lat:2082/595983342777py/030626py/50373
+#EXTINF:-1 tvg-id="ESPN 4.cl" tvg-name="ESPN 4 HD" tvg-logo="https://i.postimg.cc/Dfcvzc3w/61a4c896fc740bb1476f0225-LOGO-ESPN4-2.png" group-title="DEPORTES",ESPN 4 HD
+http://playtvch.lat:2082/595983342777py/030626py/50372
+#EXTINF:-1 tvg-id="ESPN 5.cl" tvg-name="ESPN 5" tvg-logo="https://www.tumundo.cl/wp-content/uploads/2022/11/Proyecto-nuevo-1.png" group-title="DEPORTES",ESPN 5
+http://playtvch.lat:2082/595983342777py/030626py/52202
+#EXTINF:-1 tvg-id="ESPN 5.cl" tvg-name="ESPN 5 HD" tvg-logo="https://www.tumundo.cl/wp-content/uploads/2022/11/Proyecto-nuevo-1.png" group-title="DEPORTES",ESPN 5 HD
+http://playtvch.lat:2082/595983342777py/030626py/76707
+#EXTINF:-1 tvg-id="ESPN 6.cl" tvg-name="ESPN 6" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/ESPN_6_logo.svg/2560px-ESPN_6_logo.svg.png" group-title="DEPORTES",ESPN 6
+http://playtvch.lat:2082/595983342777py/030626py/54541
+#EXTINF:-1 tvg-id="ESPN 6.cl" tvg-name="ESPN 6 HD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/ESPN_6_logo.svg/2560px-ESPN_6_logo.svg.png" group-title="DEPORTES",ESPN 6 HD
+http://playtvch.lat:2082/595983342777py/030626py/3084
+#EXTINF:-1 tvg-id="ESPN 7.cl" tvg-name="ESPN 7" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/ESPN_7_logo.svg/2560px-ESPN_7_logo.svg.png" group-title="DEPORTES",ESPN 7
+http://playtvch.lat:2082/595983342777py/030626py/37134
+#EXTINF:-1 tvg-id="ESPN 7.cl" tvg-name="ESPN 7 HD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/ESPN_7_logo.svg/2560px-ESPN_7_logo.svg.png" group-title="DEPORTES",ESPN 7 HD
+http://playtvch.lat:2082/595983342777py/030626py/3083
+#EXTINF:-1 tvg-id="ESPN HD.cl" tvg-name="ESPN Chile" tvg-logo="https://i.postimg.cc/3wGdsjwD/espn.png" group-title="DEPORTES",ESPN Chile
+http://playtvch.lat:2082/595983342777py/030626py/50968
+#EXTINF:-1 tvg-id="ESPN HD.cl" tvg-name="ESPN Chile HD" tvg-logo="https://i.postimg.cc/3wGdsjwD/espn.png" group-title="DEPORTES",ESPN Chile HD
+http://playtvch.lat:2082/595983342777py/030626py/51270
+#EXTINF:-1 tvg-id="ESPN Premium.cl" tvg-name="Espn Premium Chile" tvg-logo="https://r2.thesportsdb.com/images/media/channel/logo/7zpcyf1707916649.png" group-title="DEPORTES",Espn Premium Chile
+http://playtvch.lat:2082/595983342777py/030626py/81532
+#EXTINF:-1 tvg-id="ESPN 2.cl" tvg-name="ESPN 2 Chile" tvg-logo="https://i.postimg.cc/3wGdsjwD/espn.png" group-title="DEPORTES",ESPN 2 Chile
+http://playtvch.lat:2082/595983342777py/030626py/79153
+#EXTINF:-1 tvg-id="ESPN.co" tvg-name="ESPN Colombia" tvg-logo="https://i.postimg.cc/3wGdsjwD/espn.png" group-title="DEPORTES",ESPN Colombia
+http://playtvch.lat:2082/595983342777py/030626py/54850
+#EXTINF:-1 tvg-id="AEBrazil.br" tvg-name="ESPN Extra Brasil" tvg-logo="http://cdn.vizio.com/skin/frontend/enterprise/vizio/landingpages/gamedaylanding2/images/gd-apps-logo-ESPN-extra.png" group-title="DEPORTES",ESPN Extra Brasil
+http://playtvch.lat:2082/595983342777py/030626py/14132
+#EXTINF:-1 tvg-id="ESPN.co" tvg-name="ESPN 1 Latino" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/1280px-ESPN_wordmark.svg.png" group-title="DEPORTES",ESPN 1 Latino
+http://playtvch.lat:2082/595983342777py/030626py/7023
+#EXTINF:-1 tvg-id="ESPN.co" tvg-name="ESPN 1 Latino HD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/1280px-ESPN_wordmark.svg.png" group-title="DEPORTES",ESPN 1 Latino HD
+http://playtvch.lat:2082/595983342777py/030626py/53419
+#EXTINF:-1 tvg-id="ESPN 2.co" tvg-name="ESPN 2 Latino" tvg-logo="https://vignette.wikia.nocookie.net/disney/images/d/d9/2000px-ESPN2_logo.png" group-title="DEPORTES",ESPN 2 Latino
+http://playtvch.lat:2082/595983342777py/030626py/7024
+#EXTINF:-1 tvg-id="ESPN 2.co" tvg-name="ESPN 2 Latino HD" tvg-logo="https://vignette.wikia.nocookie.net/disney/images/d/d9/2000px-ESPN2_logo.png" group-title="DEPORTES",ESPN 2 Latino HD
+http://playtvch.lat:2082/595983342777py/030626py/3075
+#EXTINF:-1 tvg-id="ESPN 3.co" tvg-name="ESPN 3 Latino" tvg-logo="http://dshm.tmsimg.com/h3/NowShowing/73833/s73833_h3_aa.png" group-title="DEPORTES",ESPN 3 Latino
+http://playtvch.lat:2082/595983342777py/030626py/7025
+#EXTINF:-1 tvg-id="ESPN 3 HD.co" tvg-name="ESPN 3 Latino HD" tvg-logo="http://dshm.tmsimg.com/h3/NowShowing/73833/s73833_h3_aa.png" group-title="DEPORTES",ESPN 3 Latino HD
+http://playtvch.lat:2082/595983342777py/030626py/3077
+#EXTINF:-1 tvg-id="ESPN Extra.co" tvg-name="ESPN Extra" tvg-logo="https://cdn.mitvstatic.com/channels/ar_espn-1_m.png" group-title="DEPORTES",ESPN Extra
+http://playtvch.lat:2082/595983342777py/030626py/50010
+#EXTINF:-1 tvg-id="ESPN Extra.cl" tvg-name="ESPN Extra HD" tvg-logo="https://cdn.mitvstatic.com/channels/ar_espn-1_m.png" group-title="DEPORTES",ESPN Extra HD
+http://playtvch.lat:2082/595983342777py/030626py/54070
+#EXTINF:-1 tvg-id="I206.10179.schedulesdirect.org" tvg-name="ESPN USA" tvg-logo="https://i.postimg.cc/3wGdsjwD/espn.png" group-title="DEPORTES",ESPN USA
+http://playtvch.lat:2082/595983342777py/030626py/30900
+#EXTINF:-1 tvg-id="I207.16485.schedulesdirect.org" tvg-name="ESPN News Usa" tvg-logo="https://i.ibb.co/mC80pL4/espn-news-logo.gif" group-title="DEPORTES",ESPN News Usa
+http://playtvch.lat:2082/595983342777py/030626py/30902
+#EXTINF:-1 tvg-id="Eurosport1.fr" tvg-name="EURO*SPORTS 1" tvg-logo="https://w7.pngwing.com/pngs/917/857/png-transparent-eurosport-1-logo-lyngsat-television-hot-bird-13b-discovery-channel-logo-purple-television-blue.png" group-title="DEPORTES",EURO*SPORTS 1
+http://playtvch.lat:2082/595983342777py/030626py/51159
+#EXTINF:-1 tvg-id="Eurosport1.fr" tvg-name="EURO*SPORTS 1 HD" tvg-logo="https://w7.pngwing.com/pngs/917/857/png-transparent-eurosport-1-logo-lyngsat-television-hot-bird-13b-discovery-channel-logo-purple-television-blue.png" group-title="DEPORTES",EURO*SPORTS 1 HD
+http://playtvch.lat:2082/595983342777py/030626py/51367
+#EXTINF:-1 tvg-id="0porMovistarPlus.es" tvg-name="EURO*SPORTS 2" tvg-logo="http://vfes-images.ott.kaltura.com/351be6f3a78f44b6b4673c0b3e3ad570_288X162.png" group-title="DEPORTES",EURO*SPORTS 2
+http://playtvch.lat:2082/595983342777py/030626py/3424
+#EXTINF:-1 tvg-id="Eurosport2.fr" tvg-name="EURO*SPORTS 2 HD" tvg-logo="http://vfes-images.ott.kaltura.com/351be6f3a78f44b6b4673c0b3e3ad570_288X162.png" group-title="DEPORTES",EURO*SPORTS 2 HD
+http://playtvch.lat:2082/595983342777py/030626py/51368
+#EXTINF:-1 tvg-id="Canal A&E (Ecuador).ec" tvg-name="ECDF" tvg-logo="https://i.postimg.cc/d3KfXstS/el-c-d-f.jpg" group-title="DEPORTES",ECDF
+http://playtvch.lat:2082/595983342777py/030626py/52252
+#EXTINF:-1 tvg-id="" tvg-name="DAZN 1" tvg-logo="https://images.icon-icons.com/2389/PNG/512/dazn_logo_icon_145353.png" group-title="DEPORTES",DAZN 1
+http://playtvch.lat:2082/595983342777py/030626py/81516
+#EXTINF:-1 tvg-id="" tvg-name="DAZN 1HD" tvg-logo="https://images.icon-icons.com/2389/PNG/512/dazn_logo_icon_145353.png" group-title="DEPORTES",DAZN 1HD
+http://playtvch.lat:2082/595983342777py/030626py/81513
+#EXTINF:-1 tvg-id="" tvg-name="DAZN 2" tvg-logo="https://images.icon-icons.com/2389/PNG/512/dazn_logo_icon_145353.png" group-title="DEPORTES",DAZN 2
+http://playtvch.lat:2082/595983342777py/030626py/81515
+#EXTINF:-1 tvg-id="" tvg-name="DAZN 2HD" tvg-logo="https://images.icon-icons.com/2389/PNG/512/dazn_logo_icon_145353.png" group-title="DEPORTES",DAZN 2HD
+http://playtvch.lat:2082/595983342777py/030626py/81514
+#EXTINF:-1 tvg-id="" tvg-name="DAZN 3" tvg-logo="https://images.icon-icons.com/2389/PNG/512/dazn_logo_icon_145353.png" group-title="DEPORTES",DAZN 3
+http://playtvch.lat:2082/595983342777py/030626py/81520
+#EXTINF:-1 tvg-id="" tvg-name="DAZN 4" tvg-logo="https://images.icon-icons.com/2389/PNG/512/dazn_logo_icon_145353.png" group-title="DEPORTES",DAZN 4
+http://playtvch.lat:2082/595983342777py/030626py/81521
+#EXTINF:-1 tvg-id="" tvg-name="DAZN HD" tvg-logo="https://images.icon-icons.com/2389/PNG/512/dazn_logo_icon_145353.png" group-title="DEPORTES",DAZN HD
+http://playtvch.lat:2082/595983342777py/030626py/81512
+#EXTINF:-1 tvg-id="" tvg-name="DAZN LIGA " tvg-logo="https://images.icon-icons.com/2389/PNG/512/dazn_logo_icon_145353.png" group-title="DEPORTES",DAZN LIGA 
+http://playtvch.lat:2082/595983342777py/030626py/81518
+#EXTINF:-1 tvg-id="" tvg-name="DAZN LIGA2" tvg-logo="https://images.icon-icons.com/2389/PNG/512/dazn_logo_icon_145353.png" group-title="DEPORTES",DAZN LIGA2
+http://playtvch.lat:2082/595983342777py/030626py/81517
+#EXTINF:-1 tvg-id="" tvg-name="Fight Time" tvg-logo="https://pbs.twimg.com/profile_images/817806134702702592/fsfGoMK3_400x400.jpg" group-title="DEPORTES",Fight Time
+http://playtvch.lat:2082/595983342777py/030626py/6915
+#EXTINF:-1 tvg-id="" tvg-name="Flow Sports" tvg-logo="https://www.stlucianewsonline.com/wp-content/uploads/2015/11/index.png" group-title="DEPORTES",Flow Sports
+http://playtvch.lat:2082/595983342777py/030626py/6872
+#EXTINF:-1 tvg-id="FOX SPORTS.ar" tvg-name="Fox Sports 1 Argentina " tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Logo_fox_sports_2012.png/640px-Logo_fox_sports_2012.png" group-title="DEPORTES",Fox Sports 1 Argentina 
+http://playtvch.lat:2082/595983342777py/030626py/3082
+#EXTINF:-1 tvg-id="FOX SPORTS.ar" tvg-name="Fox Sports 1 Argentina HD " tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Logo_fox_sports_2012.png/640px-Logo_fox_sports_2012.png" group-title="DEPORTES",Fox Sports 1 Argentina HD 
+http://playtvch.lat:2082/595983342777py/030626py/30935
+#EXTINF:-1 tvg-id="FOX SPORTS 2.ar" tvg-name="Fox Sports 2 Argentina" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Fox_Sports_2_Argentina_2023.svg/800px-Fox_Sports_2_Argentina_2023.svg.png" group-title="DEPORTES",Fox Sports 2 Argentina
+http://playtvch.lat:2082/595983342777py/030626py/3086
+#EXTINF:-1 tvg-id="FOX SPORTS 2.ar" tvg-name="Fox Sports 2 Argentina HD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Fox_Sports_2_Argentina_2023.svg/800px-Fox_Sports_2_Argentina_2023.svg.png" group-title="DEPORTES",Fox Sports 2 Argentina HD
+http://playtvch.lat:2082/595983342777py/030626py/76708
+#EXTINF:-1 tvg-id="FOX SPORTS 3.ar" tvg-name="Fox Sports 3 Argentina" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Fox_Sports_3_Argentina_2023.svg/1200px-Fox_Sports_3_Argentina_2023.svg.png" group-title="DEPORTES",Fox Sports 3 Argentina
+http://playtvch.lat:2082/595983342777py/030626py/76709
+#EXTINF:-1 tvg-id="FOX SPORTS 3.ar" tvg-name="Fox Sports 3 Argentina HD" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Fox_Sports_3_Argentina_2023.svg/1200px-Fox_Sports_3_Argentina_2023.svg.png" group-title="DEPORTES",Fox Sports 3 Argentina HD
+http://playtvch.lat:2082/595983342777py/030626py/76710
+#EXTINF:-1 tvg-id="FOX Sports.co" tvg-name="Fox Sports 1 Latino " tvg-logo="https://i.postimg.cc/5NNj4Ygj/f1lat.png" group-title="DEPORTES",Fox Sports 1 Latino 
+http://playtvch.lat:2082/595983342777py/030626py/3087
+#EXTINF:-1 tvg-id="FOX Sports.co" tvg-name="Fox Sports 1 Latino HD" tvg-logo="https://i.postimg.cc/5NNj4Ygj/f1lat.png" group-title="DEPORTES",Fox Sports 1 Latino HD
+http://playtvch.lat:2082/595983342777py/030626py/3088
+#EXTINF:-1 tvg-id="FOX Sports 2.co" tvg-name="Fox Sports 2 Latino " tvg-logo="https://i.postimg.cc/kg24S0km/f2lat.png" group-title="DEPORTES",Fox Sports 2 Latino 
+http://playtvch.lat:2082/595983342777py/030626py/3089
+#EXTINF:-1 tvg-id="FOX Sports 2.co" tvg-name="Fox Sports 2 Latino HD" tvg-logo="https://i.postimg.cc/kg24S0km/f2lat.png" group-title="DEPORTES",Fox Sports 2 Latino HD
+http://playtvch.lat:2082/595983342777py/030626py/3090
+#EXTINF:-1 tvg-id="FOX Sports 3.co" tvg-name="Fox Sports 3 Latino " tvg-logo="https://i.postimg.cc/DwRzPCTb/f3lat.png" group-title="DEPORTES",Fox Sports 3 Latino 
+http://playtvch.lat:2082/595983342777py/030626py/3091
+#EXTINF:-1 tvg-id="FOX Sports 3.co" tvg-name="Fox Sports 3 Latino HD" tvg-logo="https://i.postimg.cc/DwRzPCTb/f3lat.png" group-title="DEPORTES",Fox Sports 3 Latino HD
+http://playtvch.lat:2082/595983342777py/030626py/3092
+#EXTINF:-1 tvg-id="FOX SPORTS.mx" tvg-name="Fox Sports México HD" tvg-logo="https://i.postimg.cc/g0VFfsf5/fsmx.png" group-title="DEPORTES",Fox Sports México HD
+http://playtvch.lat:2082/595983342777py/030626py/5616
+#EXTINF:-1 tvg-id="FOX Sports Premium.ar" tvg-name="Fox Sports Premium" tvg-logo="https://i.postimg.cc/G3jHnJkZ/f1ar.png" group-title="DEPORTES",Fox Sports Premium
+http://playtvch.lat:2082/595983342777py/030626py/52561
+#EXTINF:-1 tvg-id="AEBrazil.br" tvg-name="Fox Sports 2 Brasil" tvg-logo="https://i.postimg.cc/zGYhJXyQ/sp-br.png" group-title="DEPORTES",Fox Sports 2 Brasil
+http://playtvch.lat:2082/595983342777py/030626py/14134
+#EXTINF:-1 tvg-id="Fox Sports 1 HD (1652).us" tvg-name="Fox Sports USA" tvg-logo="https://i.postimg.cc/G3jHnJkZ/f1ar.png" group-title="DEPORTES",Fox Sports USA
+http://playtvch.lat:2082/595983342777py/030626py/77437
+#EXTINF:-1 tvg-id="Fox Sports 2 HD (1651).us" tvg-name="Fox Sports 2 USA" tvg-logo="https://i.postimg.cc/G3jHnJkZ/f1ar.png" group-title="DEPORTES",Fox Sports 2 USA
+http://playtvch.lat:2082/595983342777py/030626py/56087
+#EXTINF:-1 tvg-id="I1.91203.schedulesdirect.org" tvg-name="Formula 1 HD" tvg-logo="https://soymotor.com/sites/default/files/styles/mega/public/imagenes/noticia/dazn-movistar-f1-television-2021-soymtoor-2.jpg" group-title="DEPORTES",Formula 1 HD
+http://playtvch.lat:2082/595983342777py/030626py/38487
+#EXTINF:-1 tvg-id="GOL TV.pe" tvg-name="Gol Peru" tvg-logo="https://2.bp.blogspot.com/-usJcxF6gJIg/WUVrMywkyzI/AAAAAAAAAi8/DV9fYjhJyKM5Qzd_HIJQKZ1aB-BXRi6CQCLcBGAs/s1600/gol%2Bperu.jpg" group-title="DEPORTES",Gol Peru
+http://playtvch.lat:2082/595983342777py/030626py/14029
+#EXTINF:-1 tvg-id="GOL TV.pe" tvg-name="Gol Peru HD" tvg-logo="https://2.bp.blogspot.com/-usJcxF6gJIg/WUVrMywkyzI/AAAAAAAAAi8/DV9fYjhJyKM5Qzd_HIJQKZ1aB-BXRi6CQCLcBGAs/s1600/gol%2Bperu.jpg" group-title="DEPORTES",Gol Peru HD
+http://playtvch.lat:2082/595983342777py/030626py/3098
+#EXTINF:-1 tvg-id="Golf Channel HD.co" tvg-name="Golf Channel USA (ingles)" tvg-logo="https://www.logolounge.com/wp-content/uploads/2026/01/golf-channel-new-908x1024.png" group-title="DEPORTES",Golf Channel USA (ingles)
+http://playtvch.lat:2082/595983342777py/030626py/3099
+#EXTINF:-1 tvg-id="Golf Channel HD.co" tvg-name="Golf Channel Latino" tvg-logo="https://static.wikia.nocookie.net/logopedia/images/c/c9/Golf_Channel_LA_2026.png" group-title="DEPORTES",Golf Channel Latino
+http://playtvch.lat:2082/595983342777py/030626py/38903
+#EXTINF:-1 tvg-id="" tvg-name="GOLTV" tvg-logo="https://d2po7v53a8yrck.cloudfront.net/static/2/Open/SourceLogos/Cleared%20Logos/GolTV.JPG" group-title="DEPORTES",GOLTV
+http://playtvch.lat:2082/595983342777py/030626py/57191
+#EXTINF:-1 tvg-id="" tvg-name="GolTV  HD" tvg-logo="https://d2po7v53a8yrck.cloudfront.net/static/2/Open/SourceLogos/Cleared%20Logos/GolTV.JPG" group-title="DEPORTES",GolTV  HD
+http://playtvch.lat:2082/595983342777py/030626py/3095
+#EXTINF:-1 tvg-id="" tvg-name="Liga 1 Perú" tvg-logo="https://tiermaker.com/images/templates/camisetas-liga1-per-2022-suplente-y-especiales--15374014/153740141665267601.png" group-title="DEPORTES",Liga 1 Perú
+http://playtvch.lat:2082/595983342777py/030626py/56088
+#EXTINF:-1 tvg-id="" tvg-name="Liga 1max" tvg-logo="https://tiermaker.com/images/templates/camisetas-liga1-per-2022-suplente-y-especiales--15374014/153740141665267601.png" group-title="DEPORTES",Liga 1max
+http://playtvch.lat:2082/595983342777py/030626py/128114
+#EXTINF:-1 tvg-id="" tvg-name="Liga 1 Max Perú" tvg-logo="https://tiermaker.com/images/templates/camisetas-liga1-per-2022-suplente-y-especiales--15374014/153740141665267601.png" group-title="DEPORTES",Liga 1 Max Perú
+http://playtvch.lat:2082/595983342777py/030626py/56089
+#EXTINF:-1 tvg-id="" tvg-name="Liga Hypermotion" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/LaLiga_TV_Hypermotion_2023_Logo.svg/1200px-LaLiga_TV_Hypermotion_2023_Logo.svg.png" group-title="DEPORTES",Liga Hypermotion
+http://playtvch.lat:2082/595983342777py/030626py/81869
+#EXTINF:-1 tvg-id="" tvg-name="Liga Hypermotion 2" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/LaLiga_TV_Hypermotion_2023_Logo.svg/1200px-LaLiga_TV_Hypermotion_2023_Logo.svg.png" group-title="DEPORTES",Liga Hypermotion 2
+http://playtvch.lat:2082/595983342777py/030626py/81870
+#EXTINF:-1 tvg-id="" tvg-name="Movistar Deportes España" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Movistar_Deportes.svg/1280px-Movistar_Deportes.svg.png" group-title="DEPORTES",Movistar Deportes España
+http://playtvch.lat:2082/595983342777py/030626py/3100
+#EXTINF:-1 tvg-id="M DEPORTES HD.pe" tvg-name="Movistar Deportes Peru" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Movistar_Deportes.svg/1280px-Movistar_Deportes.svg.png" group-title="DEPORTES",Movistar Deportes Peru
+http://playtvch.lat:2082/595983342777py/030626py/3102
+#EXTINF:-1 tvg-id="" tvg-name="Mov*istar Vamos" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Movistar_Deportes.svg/1280px-Movistar_Deportes.svg.png" group-title="DEPORTES",Mov*istar Vamos
+http://playtvch.lat:2082/595983342777py/030626py/30360
+#EXTINF:-1 tvg-id="I1.91203.schedulesdirect.org" tvg-name="Movistar Golf" tvg-logo="https://www.vhv.rs/dpng/d/424-4244985_file-movistar-golf-svg-logo-movistar-golf-hd.png" group-title="DEPORTES",Movistar Golf
+http://playtvch.lat:2082/595983342777py/030626py/3103
+#EXTINF:-1 tvg-id="" tvg-name="Movistar Liga" tvg-logo="" group-title="DEPORTES",Movistar Liga
+http://playtvch.lat:2082/595983342777py/030626py/105868
+#EXTINF:-1 tvg-id="I213.62081.schedulesdirect.org" tvg-name="MLB Network" tvg-logo="https://i.ibb.co/JxBvMgh/1200px-MLBNetwork-Logo-svg.png" group-title="DEPORTES",MLB Network
+
 
