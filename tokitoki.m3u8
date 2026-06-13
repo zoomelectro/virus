@@ -1,0 +1,7 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="Mega.cl" tvg-name="MEGA " tvg-logo="https://i.postimg.cc/Hkb12bwr/Mega-2020.png" group-title="CHILE",MEGA 
+http://playtvch.lat:2082/595983342777py/030626py/2355
+#EXTINF:-1 tvg-id="Mega.cl" tvg-name="MEGA HD" tvg-logo="https://i.postimg.cc/Hkb12bwr/Mega-2020.png" group-title="CHILE",MEGA HD
+http://playtvch.lat:2082/595983342777py/030626py/14090
+#EXTINF:-1 tvg-id="Mega.cl" tvg-name="MEGA FHD" tvg-logo="https://i.postimg.cc/Hkb12bwr/Mega-2020.png" group-title="CHILE",MEGA FHD
+http://playtvch.lat:2082/595983342777py/030626py/30904
